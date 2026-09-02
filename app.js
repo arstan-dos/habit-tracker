@@ -101,17 +101,12 @@
       var li=document.createElement('li'); li.className='item'+(isScheduled?'':' unscheduled');
 
       var group=document.createElement('div'); group.className='tickgroup';
-      var doneBtn,skipBtn;
+      var tick;
       if(isScheduled){
-        doneBtn=document.createElement('button'); doneBtn.type='button'; doneBtn.className='tickbtn done';
-        doneBtn.innerHTML='<span class="box">'+CHK+'</span><span class="cap">сделано</span>';
-        doneBtn.setAttribute('aria-pressed','false');
-        doneBtn.setAttribute('aria-label','«'+h.name+'»: отметить как сделано');
-        doneBtn.querySelector('.box').style.setProperty('--dot',h.color);
-        skipBtn=document.createElement('button'); skipBtn.type='button'; skipBtn.className='tickbtn skip';
-        skipBtn.innerHTML='<span class="box">'+SKIP+'</span><span class="cap">пропуск</span>';
-        skipBtn.setAttribute('aria-pressed','false');
-        skipBtn.setAttribute('aria-label','«'+h.name+'»: отметить как осознанный пропуск');
+        tick=document.createElement('button'); tick.type='button'; tick.className='tick';
+        tick.setAttribute('role','checkbox');
+        tick.setAttribute('aria-label','«'+h.name+'»: переключить отметку — выполнено, пропуск или не отмечено');
+        tick.style.setProperty('--dot',h.color); tick.innerHTML=CHK+SKIP;
       }else{
         var offday=document.createElement('span'); offday.className='offday-badge'; offday.textContent='не сегодня';
         group.appendChild(offday);
@@ -120,24 +115,14 @@
       function refresh(){
         if(!isScheduled)return;
         var st=stateOf(todayKey,h.id);
-        doneBtn.classList.toggle('active', st==='done');
-        doneBtn.setAttribute('aria-pressed', st==='done'?'true':'false');
-        skipBtn.classList.toggle('active', st==='skip');
-        skipBtn.setAttribute('aria-pressed', st==='skip'?'true':'false');
+        applyGridTickVisual(tick,st);
         li.classList.toggle('done', st==='done');
         li.classList.toggle('skipped', st==='skip');
       }
       if(isScheduled){
-        doneBtn.addEventListener('click',function(){
-          setDayState(todayKey,h.id, stateOf(todayKey,h.id)==='done'?'none':'done');
-          refresh(); updateTodayProgress(); renderWeek(); renderProgress();
-        });
-        skipBtn.addEventListener('click',function(){
-          setDayState(todayKey,h.id, stateOf(todayKey,h.id)==='skip'?'none':'skip');
-          refresh(); updateTodayProgress(); renderWeek(); renderProgress();
-        });
+        tick.addEventListener('click',function(){ cycleDayState(todayKey,h.id); afterStateChange(todayKey,h.id); });
         todayTicks[h.id]={refresh:refresh};
-        group.appendChild(doneBtn); group.appendChild(skipBtn);
+        group.appendChild(tick);
       }
 
       var body=document.createElement('div'); body.className='it-body';
@@ -449,22 +434,7 @@
     document.getElementById('sheetBackdrop').classList.remove('open'); document.body.classList.remove('modal-open'); sheetEditingId=null;
     if(sheetTrigger && typeof sheetTrigger.focus==='function') sheetTrigger.focus();
   }
-  function renderHabitManager(){
-    var list=document.getElementById('habitManager'), empty=document.getElementById('managerEmpty');
-    list.innerHTML=''; empty.hidden=state.habits.length>0;
-    state.habits.forEach(function(h){
-      var item=document.createElement('li'); item.className='manager-item';
-      var dot=document.createElement('span'); dot.className='hdot'; dot.style.background=h.color;
-      var info=document.createElement('div'); info.className='manager-info';
-      var name=document.createElement('div'); name.className='manager-name'; name.textContent=h.name;
-      var schedule=document.createElement('div'); schedule.className='manager-schedule';
-      schedule.textContent=h.days.map(function(v,i){return v?DAYS[i]:null;}).filter(Boolean).join(', ');
-      var edit=document.createElement('button'); edit.type='button'; edit.className='navbtn manager-edit'; edit.textContent='Изменить';
-      edit.setAttribute('aria-label','Изменить привычку «'+h.name+'»'); edit.addEventListener('click',function(){openHabitSheet(h);});
-      info.appendChild(name); info.appendChild(schedule); item.appendChild(dot); item.appendChild(info); item.appendChild(edit); list.appendChild(item);
-    });
-  }
-  function renderAll(){ buildToday(); renderWeek(); renderProgress(); renderHabitManager(); }
+  function renderAll(){ buildToday(); renderWeek(); renderProgress(); }
 
   document.getElementById('habitSave').addEventListener('click',function(){
     var name=document.getElementById('habitName').value.trim();
@@ -513,8 +483,8 @@
   document.getElementById('sheetClose').addEventListener('click',closeSheet);
   document.getElementById('sheetBackdrop').addEventListener('click',function(e){ if(e.target===this) closeSheet(); });
   document.getElementById('headerAddBtn').addEventListener('click',function(){ openHabitSheet(null); });
+  document.getElementById('todayAddBtn').addEventListener('click',function(){ openHabitSheet(null); });
   document.getElementById('emptyAddBtn').addEventListener('click',function(){ openHabitSheet(null); });
-  document.getElementById('managerAddBtn').addEventListener('click',function(){ openHabitSheet(null); });
   document.getElementById('importBackup').addEventListener('click',importBackup);
 
   document.getElementById('sheetBackdrop').addEventListener('keydown',function(e){
@@ -557,4 +527,5 @@
 
   load().then(function(){ renderAll(); bindReflect(); });
 })();
+
 
