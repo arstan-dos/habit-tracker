@@ -59,6 +59,11 @@
   li.item:first-child{border-top:0}
 
   .tickgroup{display:flex;gap:8px;flex:0 0 auto}
+  .offday-badge{width:84px;min-height:31px;display:flex;align-items:center;justify-content:center;border:1px dashed var(--line);
+    border-radius:8px;color:var(--muted);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.2px}
+  .item.unscheduled{opacity:.72}
+  .item.unscheduled .it-title .t{color:var(--muted)}
+  .offday-summary{border-left:3px solid var(--line);padding:8px 10px;margin:2px 0 8px}
   .tickbtn{display:flex;flex-direction:column;align-items:center;gap:3px;border:0;background:transparent;cursor:pointer;padding:1px 0;width:38px}
   .tickbtn .box{width:24px;height:24px;border-radius:7px;border:2px solid var(--line);background:#fff;display:grid;place-items:center;margin:0 auto}
   .tickbtn .cap{font-size:9px;color:var(--muted);font-weight:700;letter-spacing:.2px;line-height:1;text-transform:uppercase}
