@@ -1,0 +1,16 @@
+{
+  "name": "Rhythm — трекер привычек",
+  "short_name": "Rhythm",
+  "description": "Личный трекер привычек: заведи свои привычки, отмечай день за днём, смотри серии и прогресс.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#EEF0EC",
+  "theme_color": "#2B6491",
+  "lang": "ru",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}
