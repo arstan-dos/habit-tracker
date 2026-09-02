@@ -1,32 +1,36 @@
-var CACHE='rhythm-v2';
-var ASSETS=['./','./index.html','./manifest.json','./icon.svg'];
+var CACHE='rhythm-v4';
+var ASSETS=['./','./index.html','./styles.css','./model.js','./app.js','./manifest.json','./icon.svg'];
 
-self.addEventListener('install', function(e){
-  e.waitUntil(caches.open(CACHE).then(function(c){ return c.addAll(ASSETS); }).catch(function(){}));
+self.addEventListener('install',function(event){
+  event.waitUntil(caches.open(CACHE).then(function(cache){return cache.addAll(ASSETS);}));
   self.skipWaiting();
 });
 
-self.addEventListener('activate', function(e){
-  e.waitUntil(
-    caches.keys().then(function(keys){
-      return Promise.all(keys.filter(function(k){ return k!==CACHE; }).map(function(k){ return caches.delete(k); }));
-    })
-  );
-  self.clients.claim();
+self.addEventListener('activate',function(event){
+  event.waitUntil(caches.keys().then(function(keys){
+    return Promise.all(keys.filter(function(key){return key!==CACHE;}).map(function(key){return caches.delete(key);}));
+  }).then(function(){return self.clients.claim();}));
 });
 
-self.addEventListener('fetch', function(e){
-  if(e.request.method!=='GET') return;
-  e.respondWith(
-    caches.match(e.request).then(function(cached){
-      var fetchPromise=fetch(e.request).then(function(resp){
-        if(resp && resp.status===200){
-          var copy=resp.clone();
-          caches.open(CACHE).then(function(c){ c.put(e.request, copy); });
-        }
-        return resp;
-      }).catch(function(){ return cached; });
-      return cached || fetchPromise;
-    })
-  );
+self.addEventListener('fetch',function(event){
+  if(event.request.method!=='GET')return;
+  var url=new URL(event.request.url);
+  if(url.origin!==self.location.origin)return;
+
+  if(event.request.mode==='navigate'){
+    event.respondWith(fetch(event.request).then(function(response){
+      if(response.ok)caches.open(CACHE).then(function(cache){cache.put('./index.html',response.clone());});
+      return response;
+    }).catch(function(){return caches.match('./index.html');}));
+    return;
+  }
+
+  event.respondWith(caches.match(event.request).then(function(cached){
+    var update=fetch(event.request).then(function(response){
+      if(response.ok)caches.open(CACHE).then(function(cache){cache.put(event.request,response.clone());});
+      return response;
+    });
+    return cached||update;
+  }));
 });
+

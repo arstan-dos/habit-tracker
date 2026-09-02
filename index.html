@@ -2,6 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; manifest-src 'self'; worker-src 'self'">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Rhythm — трекер привычек</title>
 <meta name="theme-color" content="#2B6491">
@@ -16,213 +17,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Archivo+Expanded:wght@700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --paper:#EEF0EC; --panel:#FFFFFF; --ink:#17232B; --muted:#69747E;
-    --line:#D9DED9; --line-soft:#E6EAE5;
-    --accent:#2B6491; --accent-deep:#1D4B72; --amber:#C6871F; --danger:#B5484B;
-    --grid:rgba(43,100,145,.05);
-    --display:'Archivo Expanded','Archivo',sans-serif;
-    --radius:14px;
-  }
-  *{box-sizing:border-box}
-  html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
-  html,body{margin:0;overflow-x:hidden}
-  body{
-    font-family:Inter,system-ui,-apple-system,sans-serif; color:var(--ink);
-    background-color:var(--paper);
-    background-image:linear-gradient(var(--grid) 1px,transparent 1px),
-                     linear-gradient(90deg,var(--grid) 1px,transparent 1px);
-    background-size:30px 30px;
-    -webkit-font-smoothing:antialiased; line-height:1.45;
-    min-height:100vh;
-  }
-  .wrap{max-width:760px;margin:0 auto;padding:22px 16px calc(64px + env(safe-area-inset-bottom))}
-
-  header.top{display:flex;align-items:center;justify-content:space-between;gap:14px;
-    padding-bottom:15px;margin-bottom:18px;border-bottom:1px solid var(--line)}
-  .brand h1{font-family:var(--display);font-weight:800;font-size:31px;letter-spacing:-.5px;margin:0;line-height:1;color:var(--ink)}
-  .brand p{margin:7px 0 0;color:var(--muted);font-size:12.5px;letter-spacing:.1px}
-  .iconbtn{width:38px;height:38px;border-radius:11px;border:1.5px solid var(--ink);background:var(--ink);color:#fff;
-       font-size:22px;line-height:1;display:grid;place-items:center;cursor:pointer;flex:0 0 auto;padding:0}
-  .iconbtn:hover{background:var(--accent-deep);border-color:var(--accent-deep)}
-  .iconbtn:focus-visible{outline:2px solid var(--accent-deep);outline-offset:2px}
-
-  .tabs{display:flex;gap:4px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:4px;margin-bottom:18px}
-  .tab{flex:1;border:0;background:transparent;font:inherit;font-weight:600;font-size:13.5px;color:var(--muted);
-       padding:9px 6px;border-radius:9px;cursor:pointer;transition:background .15s,color .15s}
-  .tab[aria-selected="true"]{background:var(--accent);color:#fff}
-  .tab:focus-visible{outline:2px solid var(--accent-deep);outline-offset:2px}
-
-  .panel{display:none}
-  .panel.active{display:block}
-
-  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px;max-width:100%}
-  .card + .card{margin-top:14px}
-
-  .today-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:2px}
-  .today-date{font-family:Archivo,sans-serif;font-weight:700;font-size:17px;text-transform:capitalize;letter-spacing:-.2px}
-
-  .bar{position:relative;height:10px;border-radius:5px;background:var(--line-soft);overflow:hidden;margin:13px 0 4px}
-  .bar > i{position:relative;z-index:1;display:block;height:100%;background:var(--accent);border-radius:5px;width:0;transition:width .4s cubic-bezier(.2,.7,.2,1)}
-  .bar::after{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
-    background:repeating-linear-gradient(90deg, rgba(23,35,43,.13) 0 1px, transparent 1px 10%)}
-  .bar-label{font-size:12px;color:var(--muted);margin-bottom:6px}
-  .bar-label b{color:var(--ink)}
-  .hint{font-size:11.5px;color:var(--muted);margin:0 0 8px}
-
-  ul.list{list-style:none;margin:0;padding:0}
-  li.item{display:flex;align-items:flex-start;flex-wrap:wrap;gap:10px;padding:12px 4px;border-top:1px solid var(--line-soft)}
-  li.item:first-child{border-top:0}
-
-  .tickgroup{display:flex;gap:8px;flex:0 0 auto}
-  .tickbtn{display:flex;flex-direction:column;align-items:center;gap:3px;border:0;background:transparent;cursor:pointer;padding:1px 0;width:38px}
-  .tickbtn .box{width:24px;height:24px;border-radius:7px;border:2px solid var(--line);background:#fff;display:grid;place-items:center;margin:0 auto}
-  .tickbtn .cap{font-size:9px;color:var(--muted);font-weight:700;letter-spacing:.2px;line-height:1;text-transform:uppercase}
-  .tickbtn.done .box svg{width:14px;height:14px;stroke:#fff;stroke-width:3.4;fill:none;opacity:0;transform:scale(.6);transition:opacity .12s,transform .12s}
-  .tickbtn.done.active .box{background:var(--dot,var(--accent));border-color:var(--dot,var(--accent))}
-  .tickbtn.done.active .box svg{opacity:1;transform:scale(1)}
-  .tickbtn.done.active .cap{color:var(--ink)}
-  .tickbtn.skip .box{border-style:dashed}
-  .tickbtn.skip .box .skipmark{font-weight:800;color:var(--amber);font-size:14px;line-height:1;opacity:0}
-  .tickbtn.skip.active .box{border-color:var(--amber)}
-  .tickbtn.skip.active .box .skipmark{opacity:1}
-  .tickbtn.skip.active .cap{color:var(--amber)}
-  .tickbtn:focus-visible{outline:2px solid var(--accent-deep);outline-offset:2px;border-radius:8px}
-
-  .it-body{flex:1 1 140px;min-width:0;padding-top:2px}
-  .it-title{font-weight:600;font-size:14px;background:none;border:0;padding:0;font-family:inherit;color:var(--ink);text-align:left;cursor:pointer}
-  .it-title .chev{display:inline-block;width:0;height:0;border-left:5px solid var(--muted);
-       border-top:4px solid transparent;border-bottom:4px solid transparent;margin-left:7px;transform:rotate(0);transition:transform .15s;vertical-align:middle}
-  .it-title[aria-expanded="true"] .chev{transform:rotate(90deg)}
-  .it-title:focus-visible{outline:2px solid var(--accent-deep);outline-offset:2px;border-radius:4px}
-  .it-desc{color:var(--muted);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:2px}
-  li.done .it-title .t{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--line)}
-  li.skipped .it-title .t{color:var(--muted)}
-  .rowedit{flex:0 0 auto;width:30px;height:30px;border:0;background:transparent;color:var(--muted);font-size:15px;
-       line-height:1;border-radius:8px;cursor:pointer;display:grid;place-items:center;padding:0}
-  .rowedit:hover{background:var(--line-soft);color:var(--ink)}
-  .rowedit:focus-visible{outline:2px solid var(--accent-deep);outline-offset:2px}
-  .detail{flex-basis:100%;width:100%;order:9;display:none;padding:6px 2px 8px 2px}
-  .detail.open{display:block}
-  .dlabel{font-size:11.5px;color:var(--muted);margin:2px 0 6px}
-  .tinput{width:100%;border:1px solid var(--line);border-radius:9px;padding:9px 11px;font:inherit;font-size:16px;
-       color:var(--ink);background:#fff;resize:vertical;line-height:1.4}
-  .tinput:focus{outline:2px solid var(--accent);outline-offset:0;border-color:var(--accent)}
-  .alldone{margin-top:12px;font-size:13px;color:#5E9E3E;font-weight:600;display:none}
-  .alldone.show{display:block}
-
-  .sublist{list-style:none;margin:0 0 12px;padding:0}
-  .subitem{display:flex;align-items:center;gap:10px;padding:6px 0}
-  .subcheck{flex:0 0 auto;width:22px;height:22px;border-radius:6px;border:2px solid var(--line);background:#fff;cursor:pointer;display:grid;place-items:center;padding:0}
-  .subcheck svg{width:13px;height:13px;stroke:#fff;stroke-width:3.6;fill:none;opacity:0;transform:scale(.6);transition:opacity .12s,transform .12s}
-  .subcheck.on{background:var(--dot,var(--accent));border-color:var(--dot,var(--accent))}
-  .subcheck.on svg{opacity:1;transform:scale(1)}
-  .subcheck:focus-visible{outline:2px solid var(--accent-deep);outline-offset:2px}
-  .subtext{font-size:13px;color:var(--ink)}
-
-  .empty-state{text-align:center;padding:30px 8px 8px}
-  .empty-badge{width:52px;height:52px;border-radius:16px;background:var(--accent);color:#fff;font-size:28px;font-weight:800;
-       display:grid;place-items:center;margin:0 auto 16px;line-height:1}
-  .empty-state h2{font-family:Archivo,sans-serif;font-size:17px;margin:0 0 8px}
-  .empty-state p{color:var(--muted);font-size:13px;line-height:1.55;margin:0 auto 18px;max-width:320px}
-
-  .sheet-backdrop{position:fixed;inset:0;background:rgba(23,35,43,.45);display:none;align-items:flex-end;justify-content:center;z-index:50}
-  .sheet-backdrop.open{display:flex}
-  .sheet{background:var(--panel);width:100%;max-width:480px;border-radius:18px 18px 0 0;padding:20px 18px calc(20px + env(safe-area-inset-bottom));max-height:88vh;overflow:auto;overflow-x:hidden}
-  @media (min-width:600px){ .sheet-backdrop{align-items:center;padding:20px} .sheet{border-radius:16px} }
-  .sheet-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
-  .sheet-title{font-family:Archivo,sans-serif;font-weight:700;font-size:16px}
-  .sheet-close{width:30px;height:30px;border:0;background:var(--line-soft);border-radius:9px;font-size:17px;cursor:pointer;color:var(--ink);line-height:1;flex:0 0 auto}
-  .sheet-close:focus-visible{outline:2px solid var(--accent-deep);outline-offset:2px}
-  .flabel{display:block;font-size:11.5px;color:var(--muted);margin:16px 0 6px}
-  .flabel:first-of-type{margin-top:0}
-  .opt-tag{font-weight:500;opacity:.75}
-  .finput{width:100%;max-width:100%;border:1px solid var(--line);border-radius:9px;padding:10px 12px;font:inherit;font-size:16px;background:#fff;color:var(--ink)}
-  .finput:focus{outline:2px solid var(--accent);outline-offset:0;border-color:var(--accent)}
-  .daypicker{display:flex;gap:6px;flex-wrap:wrap}
-  .daychip{flex:1 1 auto;min-width:38px;border:1.5px solid var(--line);background:#fff;border-radius:9px;padding:9px 0;
-       font:inherit;font-size:12.5px;font-weight:600;color:var(--muted);cursor:pointer;text-align:center}
-  .daychip.on{background:var(--accent);border-color:var(--accent);color:#fff}
-  .daychip:focus-visible{outline:2px solid var(--accent-deep);outline-offset:2px}
-  .subrow{display:flex;gap:8px;align-items:center;margin-top:8px;max-width:100%}
-  .subrow .finput{flex:1 1 auto;min-width:0}
-  .subrm{flex:0 0 auto;width:32px;height:32px;border:0;background:var(--line-soft);border-radius:8px;font-size:16px;color:var(--ink);cursor:pointer}
-  .subrm:hover{background:#EBD9D9;color:var(--danger)}
-  .subadd{margin-top:8px}
-  .sheet-actions{display:flex;flex-direction:column;gap:10px;margin-top:22px}
-  .btn-danger{background:#fff;color:var(--danger);border:1.5px solid var(--danger);border-radius:10px;padding:10px 16px;font:inherit;font-weight:600;font-size:13.5px;cursor:pointer}
-  .btn-danger:hover{background:var(--danger);color:#fff}
-
-  .weeknav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:8px}
-  .weeknav .lbl{font-family:Archivo,sans-serif;font-weight:700;font-size:14px}
-  .navbtn{border:1px solid var(--line);background:#fff;border-radius:9px;padding:6px 11px;font:inherit;font-size:13px;cursor:pointer;color:var(--ink)}
-  .navbtn:hover{border-color:var(--accent)}
-  .navbtn:focus-visible{outline:2px solid var(--accent-deep);outline-offset:2px}
-  .navbtn.small{padding:6px 10px;font-weight:600}
-  .grid{width:100%;border-collapse:collapse}
-  .grid th,.grid td{text-align:center;padding:0}
-  .grid thead th{padding-bottom:8px;font-size:11px;color:var(--muted);font-weight:600}
-  .grid thead th .dn{display:block;font-family:Archivo,sans-serif;font-size:13px;color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums}
-  .grid th.hlabel{text-align:left;width:40%;padding-left:2px}
-  .col-today .dn,.col-today{color:var(--accent)!important}
-  .grid tbody td{padding:5px 0}
-  .grid tbody tr{border-top:1px solid var(--line-soft)}
-  .hcell{display:flex;align-items:center;gap:9px;text-align:left;padding:9px 2px}
-  .hdot{width:10px;height:10px;border-radius:3px;flex:0 0 auto}
-  .hname{font-size:13px;font-weight:600;line-height:1.15}
-  .gtick{width:24px;height:24px;border-radius:7px;border:2px solid var(--line);background:#fff;cursor:pointer;display:inline-grid;place-items:center;padding:0}
-  .gtick svg{width:13px;height:13px;stroke:#fff;stroke-width:3.4;fill:none;opacity:0}
-  .gtick .skipmark{font-weight:800;color:var(--amber);font-size:14px;line-height:1;display:none}
-  .gtick[data-state="done"]{background:var(--dot);border-color:var(--dot)}
-  .gtick[data-state="done"] svg{opacity:1}
-  .gtick[data-state="skip"]{border-color:var(--amber);border-style:dashed;background:#fff}
-  .gtick[data-state="skip"] .skipmark{display:block}
-  .gtick.na{border:0;background:transparent;cursor:default}
-  .gtick.na::after{content:"·";color:#C4CAC4;font-weight:700}
-  .gtick:focus-visible{outline:2px solid var(--accent-deep);outline-offset:2px}
-  .gtd{background:rgba(43,100,145,.05)}
-  .weekpct{margin-top:14px;display:flex;align-items:center;gap:12px}
-  .weekpct .bar{flex:1;margin:0}
-  .weekpct .num{font-family:Archivo,sans-serif;font-weight:800;font-size:18px;min-width:44px;text-align:right}
-  .legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:14px;font-size:11.5px;color:var(--muted)}
-  .legend span{white-space:nowrap}
-  .legend i{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin-right:5px;border:2px solid var(--line);background:#fff}
-  .legend .l-done{background:var(--accent);border-color:var(--accent)}
-  .legend .l-skip{background:#fff;border-color:var(--amber);border-style:dashed}
-
-  .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-  .stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:15px}
-  .stat b{font-family:var(--display);font-weight:800;font-size:25px;letter-spacing:-.5px;display:block;line-height:1}
-  .stat span{color:var(--muted);font-size:12px;display:block;margin-top:6px}
-  .stat.accent{background:var(--accent);border-color:var(--accent)}
-  .stat.accent b,.stat.accent span{color:#fff}
-  .stat.accent span{opacity:.82}
-  .hrow{display:flex;align-items:center;gap:10px;padding:10px 2px;border-top:1px solid var(--line-soft)}
-  .hrow:first-child{border-top:0}
-  .hrow .hdot{width:11px;height:11px;border-radius:3px}
-  .hrow .nm{flex:1;font-size:13.5px;font-weight:600}
-  .hrow .val{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;text-align:right}
-  .hrow .val b{color:var(--ink);font-family:Archivo,sans-serif}
-  .note{color:var(--muted);font-size:11.5px;margin-top:14px;line-height:1.5}
-  h2.sec{font-family:Archivo,sans-serif;font-size:14px;font-weight:700;margin:0 0 6px}
-  .report{width:100%;height:180px;border:1px solid var(--line);border-radius:10px;padding:10px;
-       font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;color:var(--ink);background:#FAFBFA;
-       white-space:pre;overflow:auto;margin-top:10px;resize:vertical;line-height:1.5}
-  .report:focus{outline:2px solid var(--accent);border-color:var(--accent)}
-  .btnrow{display:flex;gap:10px;align-items:center;margin-top:10px;flex-wrap:wrap}
-  .btn-primary{background:var(--accent);color:#fff;border:0;border-radius:10px;padding:10px 16px;font:inherit;font-weight:600;font-size:13.5px;cursor:pointer}
-  .btn-primary:hover{background:var(--accent-deep)}
-  .btn-primary:focus-visible{outline:2px solid var(--accent-deep);outline-offset:2px}
-  .copied{font-size:12.5px;color:#5E9E3E;font-weight:600;display:none}
-  .copied.show{display:inline}
-
-  @media (max-width:460px){
-    li.done .it-desc{display:none}
-    .grid th.hlabel{width:44%}
-  }
-  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
-</style>
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
 <div class="wrap">
@@ -234,22 +29,23 @@
     <button class="iconbtn" id="headerAddBtn" aria-label="Добавить привычку">+</button>
   </header>
 
-  <div class="tabs" role="tablist">
-    <button class="tab" role="tab" aria-selected="true"  data-tab="today">Сегодня</button>
-    <button class="tab" role="tab" aria-selected="false" data-tab="week">Неделя</button>
-    <button class="tab" role="tab" aria-selected="false" data-tab="progress">Прогресс</button>
+  <div class="tabs" role="tablist" aria-label="Разделы приложения">
+    <button class="tab" id="tab-today" role="tab" aria-selected="true" aria-controls="p-today" tabindex="0" data-tab="today">Сегодня</button>
+    <button class="tab" id="tab-week" role="tab" aria-selected="false" aria-controls="p-week" tabindex="-1" data-tab="week">Неделя</button>
+    <button class="tab" id="tab-progress" role="tab" aria-selected="false" aria-controls="p-progress" tabindex="-1" data-tab="progress">Прогресс</button>
+    <button class="tab" id="tab-habits" role="tab" aria-selected="false" aria-controls="p-habits" tabindex="-1" data-tab="habits">Привычки</button>
   </div>
 
-  <section class="panel active" id="p-today">
+  <section class="panel active" id="p-today" role="tabpanel" aria-labelledby="tab-today">
     <div class="card">
       <div class="today-head"><div class="today-date" id="todayDate">—</div></div>
       <div id="todayProgressBlock" hidden>
         <div class="bar"><i id="todayBar"></i></div>
         <div class="bar-label"><b id="todayDone">0</b> из <b id="todayTotal">0</b> выполнено сегодня</div>
-        <div class="hint">Слева у каждой привычки — «сделано» и «пропуск». Название со стрелкой открывает подразделы и заметку. Значок карандаша — изменить привычку.</div>
+        <div class="hint">У запланированных на сегодня привычек слева доступны «сделано» и «пропуск». Остальные привычки тоже показаны ниже. Название открывает подразделы и заметку, карандаш — редактирование.</div>
       </div>
       <ul class="list" id="todayList" hidden></ul>
-      <div class="hint" id="noneToday" hidden>На сегодня ничего не запланировано.</div>
+      <div class="hint offday-summary" id="noneToday" hidden>На сегодня ничего не запланировано. Все привычки всё равно доступны ниже.</div>
       <div class="alldone" id="allDone">День закрыт. Так держать.</div>
       <div class="empty-state" id="emptyState">
         <div class="empty-badge">+</div>
@@ -265,7 +61,7 @@
     </div>
   </section>
 
-  <section class="panel" id="p-week">
+  <section class="panel" id="p-week" role="tabpanel" aria-labelledby="tab-week" hidden>
     <div class="card">
       <div class="weeknav">
         <button class="navbtn" id="prevWeek" aria-label="Предыдущая неделя">‹</button>
@@ -288,7 +84,7 @@
     </div>
   </section>
 
-  <section class="panel" id="p-progress">
+  <section class="panel" id="p-progress" role="tabpanel" aria-labelledby="tab-progress" hidden>
     <div class="card" id="progressEmpty" hidden>
       <p class="note" style="margin-top:0">Пока нет ни одной привычки — добавь первую на вкладке «Сегодня», и здесь появится статистика.</p>
     </div>
@@ -306,20 +102,42 @@
       </div>
       <div class="card">
         <h2 class="sec">Отчёт для разбора с ИИ</h2>
-        <div class="note" style="margin-top:2px">Собери отчёт, при желании поправь текст прямо в поле, затем скопируй и вставь в новый чат с Claude (или любым ИИ) — он разберётся, что происходит. Это же твоя резервная копия данных.</div>
+        <div class="note" style="margin-top:2px">Собери отчёт, при желании поправь текст, затем скопируй его для разбора с ИИ. Полный JSON в конце отчёта можно восстановить кнопкой ниже. Перед отправкой проверь заметки: они могут содержать личные данные.</div>
         <textarea class="report" id="reportOut" placeholder="Нажми «Собрать отчёт» — здесь появится текст. Его можно редактировать перед копированием."></textarea>
         <div class="btnrow">
           <button class="btn-primary" id="buildReport">Собрать отчёт</button>
           <button class="navbtn" id="copyReport">Скопировать</button>
           <span class="copied" id="copied">Скопировано ✓</span>
         </div>
+        <div class="import-block">
+          <label class="flabel" for="backupFile">Восстановить резервную копию</label>
+          <input class="finput" id="backupFile" type="file" accept="application/json,.json,.txt,text/plain">
+          <button class="navbtn" id="importBackup" type="button">Импортировать файл</button>
+          <p class="form-error" id="importError" role="alert" hidden></p>
+        </div>
       </div>
+    </div>
+  </section>
+
+  <section class="panel" id="p-habits" role="tabpanel" aria-labelledby="tab-habits" hidden>
+    <div class="card">
+      <div class="manager-head">
+        <div>
+          <h2 class="sec">Все привычки</h2>
+          <p class="note">Здесь можно изменить или удалить привычку независимо от её расписания.</p>
+        </div>
+        <button class="btn-primary" id="managerAddBtn" type="button">Добавить</button>
+      </div>
+      <ul class="manager-list" id="habitManager"></ul>
+      <p class="hint" id="managerEmpty">Пока нет привычек.</p>
     </div>
   </section>
 </div>
 
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
 <div class="sheet-backdrop" id="sheetBackdrop">
-  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" aria-describedby="scheduleHint" tabindex="-1">
     <div class="sheet-head">
       <div id="sheetTitle" class="sheet-title">Новая привычка</div>
       <button class="sheet-close" id="sheetClose" aria-label="Закрыть">×</button>
@@ -328,8 +146,10 @@
     <input class="finput" id="habitName" type="text" placeholder="Например: Чтение" maxlength="40">
     <label class="flabel" for="habitSubtitle">Подзаголовок <span class="opt-tag">необязательно</span></label>
     <input class="finput" id="habitSubtitle" type="text" placeholder="Например: 20 минут перед сном" maxlength="60">
-    <label class="flabel">Дни недели</label>
-    <div class="daypicker" id="dayPicker"></div>
+    <div class="flabel" id="dayPickerLabel">Дни недели</div>
+    <div class="daypicker" id="dayPicker" role="group" aria-labelledby="dayPickerLabel"></div>
+    <p class="form-error" id="dayError" role="alert" hidden>Выберите хотя бы один день недели.</p>
+    <p class="hint" id="scheduleHint">Изменение расписания применяется с сегодняшнего дня и не переписывает прошлую статистику.</p>
     <label class="flabel">Подразделы <span class="opt-tag">необязательно — например, этапы привычки</span></label>
     <div id="subitemsList"></div>
     <button type="button" class="navbtn small subadd" id="addSubitem">+ Добавить подраздел</button>
@@ -340,505 +160,8 @@
   </div>
 </div>
 
-<script>
-(function(){
-  "use strict";
-  var CHK='<svg viewBox="0 0 24 24"><path d="M4 12l6 6L20 5"/></svg>';
-  var SKIP='<span class="skipmark">×</span>';
-  var DAYS=['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
-  var PALETTE=['#5E9E3E','#C08A2A','#3E7CB1','#7E5AA8','#2E9A82','#C4703A','#4A6785','#B5484B','#4F8FA6','#8A6D3B'];
-
-  function pad(n){return (n<10?'0':'')+n;}
-  function key(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
-  function parseKey(dk){var p=dk.split('-');return new Date(+p[0],+p[1]-1,+p[2]);}
-  function wdIdx(d){return (d.getDay()+6)%7;}
-  function mondayOf(d){var x=new Date(d.getFullYear(),d.getMonth(),d.getDate());x.setDate(x.getDate()-wdIdx(x));return x;}
-  function addDays(d,n){var x=new Date(d.getFullYear(),d.getMonth(),d.getDate());x.setDate(x.getDate()+n);return x;}
-  function sameDay(a,b){return key(a)===key(b);}
-  function escapeHtml(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
-  function uid(prefix){ return prefix+'_'+Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
-
-  // ---- storage: works inside Claude (window.storage) and standalone (localStorage) ----
-  var STORE='habit_tracker_v1';
-  var state={habits:[],days:{},notes:{},journal:{},subState:{}};
-  var memStore={};
-  var hasWinStorage=(typeof window!=='undefined' && window.storage && typeof window.storage.get==='function');
-  var hasLS=(function(){ try{ var k='__rhythm_t'; localStorage.setItem(k,'1'); localStorage.removeItem(k); return true; }catch(e){ return false; } })();
-  async function rawGet(k){
-    if(hasWinStorage){ try{ var r=await window.storage.get(k); return (r&&r.value!=null)?r.value:null; }catch(e){ return null; } }
-    if(hasLS){ try{ return localStorage.getItem(k); }catch(e){} }
-    return (k in memStore)?memStore[k]:null;
-  }
-  async function rawSet(k,v){
-    if(hasWinStorage){ try{ await window.storage.set(k,v); return; }catch(e){} }
-    if(hasLS){ try{ localStorage.setItem(k,v); return; }catch(e){} }
-    memStore[k]=v;
-  }
-  async function load(){
-    try{
-      var v=await rawGet(STORE);
-      if(v){ var p=JSON.parse(v); if(p){
-        state.habits=p.habits||[]; state.days=p.days||{}; state.notes=p.notes||{};
-        state.journal=p.journal||{}; state.subState=p.subState||{};
-      } }
-    }catch(e){}
-  }
-  var saving=false,pending=false;
-  async function save(){
-    if(saving){ pending=true; return; }
-    saving=true;
-    try{ await rawSet(STORE, JSON.stringify(state)); }catch(e){}
-    saving=false;
-    if(pending){ pending=false; save(); }
-  }
-  var tTimer; function saveSoon(){ clearTimeout(tTimer); tTimer=setTimeout(save,400); }
-
-  function stateOf(dk,id){ var d=state.days[dk]; if(!d) return 'none'; var v=d[id]; return v===true?'done':(v==='skip'?'skip':'none'); }
-  function setDayState(dk,id,val){
-    var d=state.days[dk]; if(!d){ d={}; state.days[dk]=d; }
-    if(val==='done') d[id]=true; else if(val==='skip') d[id]='skip'; else delete d[id];
-    if(Object.keys(d).length===0) delete state.days[dk];
-    save();
-  }
-  function cycleDayState(dk,id){
-    var cur=stateOf(dk,id);
-    setDayState(dk,id, cur==='none'?'done':(cur==='done'?'skip':'none'));
-  }
-  function findHabit(id){ for(var i=0;i<state.habits.length;i++) if(state.habits[i].id===id) return state.habits[i]; return null; }
-
-  var todayD=new Date(), todayKey=key(todayD), todayWd=wdIdx(todayD), todayTicks={};
-
-  function afterStateChange(dk,id){
-    if(dk===todayKey && todayTicks[id]) todayTicks[id].refresh();
-    updateTodayProgress(); renderWeek(); renderProgress();
-  }
-  function applyGridTickVisual(el,st){
-    el.setAttribute('data-state',st);
-    el.setAttribute('aria-checked', st==='done'?'true':(st==='skip'?'mixed':'false'));
-  }
-
-  function scheduledOn(h,d){ var wd=wdIdx(d), dk=key(d); return !!h.days[wd] && dk>=h.createdAt; }
-
-  function dayStats(d){
-    var dk=key(d), yes=0, done=0, skip=0, pend=0;
-    state.habits.forEach(function(h){
-      if(!scheduledOn(h,d)) return;
-      yes++; var st=stateOf(dk,h.id);
-      if(st==='done') done++; else if(st==='skip') skip++; else pend++;
-    });
-    return {yes:yes,done:done,skip:skip,pending:pend,required:yes-skip,closed:(yes>0&&pend===0)};
-  }
-
-  function buildToday(){
-    document.getElementById('todayDate').textContent =
-      todayD.toLocaleDateString('ru-RU',{weekday:'long',day:'numeric',month:'long'});
-    var hasHabits=state.habits.length>0;
-    document.getElementById('emptyState').hidden=hasHabits;
-    document.getElementById('todayProgressBlock').hidden=!hasHabits;
-
-    var items=hasHabits?state.habits.filter(function(h){ return scheduledOn(h,todayD); }):[];
-    var ul=document.getElementById('todayList');
-    ul.innerHTML=''; todayTicks={};
-    ul.hidden = !hasHabits || items.length===0;
-    document.getElementById('noneToday').hidden = !(hasHabits && items.length===0);
-
-    items.forEach(function(h){
-      var li=document.createElement('li'); li.className='item';
-
-      var group=document.createElement('div'); group.className='tickgroup';
-      var doneBtn=document.createElement('button'); doneBtn.type='button'; doneBtn.className='tickbtn done';
-      doneBtn.innerHTML='<span class="box">'+CHK+'</span><span class="cap">сделано</span>';
-      doneBtn.setAttribute('aria-pressed','false');
-      doneBtn.setAttribute('aria-label','«'+h.name+'»: отметить как сделано');
-      doneBtn.querySelector('.box').style.setProperty('--dot',h.color);
-      var skipBtn=document.createElement('button'); skipBtn.type='button'; skipBtn.className='tickbtn skip';
-      skipBtn.innerHTML='<span class="box">'+SKIP+'</span><span class="cap">пропуск</span>';
-      skipBtn.setAttribute('aria-pressed','false');
-      skipBtn.setAttribute('aria-label','«'+h.name+'»: отметить как осознанный пропуск');
-
-      function refresh(){
-        var st=stateOf(todayKey,h.id);
-        doneBtn.classList.toggle('active', st==='done');
-        doneBtn.setAttribute('aria-pressed', st==='done'?'true':'false');
-        skipBtn.classList.toggle('active', st==='skip');
-        skipBtn.setAttribute('aria-pressed', st==='skip'?'true':'false');
-        li.classList.toggle('done', st==='done');
-        li.classList.toggle('skipped', st==='skip');
-      }
-      doneBtn.addEventListener('click',function(){
-        setDayState(todayKey,h.id, stateOf(todayKey,h.id)==='done'?'none':'done');
-        refresh(); updateTodayProgress(); renderWeek(); renderProgress();
-      });
-      skipBtn.addEventListener('click',function(){
-        setDayState(todayKey,h.id, stateOf(todayKey,h.id)==='skip'?'none':'skip');
-        refresh(); updateTodayProgress(); renderWeek(); renderProgress();
-      });
-      todayTicks[h.id]={refresh:refresh};
-      group.appendChild(doneBtn); group.appendChild(skipBtn);
-
-      var body=document.createElement('div'); body.className='it-body';
-      var title=document.createElement('button'); title.type='button'; title.className='it-title'; title.setAttribute('aria-expanded','false');
-      title.innerHTML='<span class="t">'+escapeHtml(h.name)+'</span> <span class="chev"></span>';
-      body.appendChild(title);
-      if(h.subtitle){ var desc=document.createElement('div'); desc.className='it-desc'; desc.textContent=h.subtitle; body.appendChild(desc); }
-
-      var edit=document.createElement('button'); edit.type='button'; edit.className='rowedit'; edit.innerHTML='✎';
-      edit.setAttribute('aria-label','Изменить привычку «'+h.name+'»');
-      edit.addEventListener('click',function(e){ e.stopPropagation(); openHabitSheet(h); });
-
-      li.appendChild(group); li.appendChild(body); li.appendChild(edit);
-
-      var det=makeExpandDetail(h,todayKey); li.appendChild(det);
-      title.addEventListener('click',function(){
-        var open=det.classList.toggle('open'); title.setAttribute('aria-expanded',open?'true':'false');
-      });
-
-      refresh();
-      ul.appendChild(li);
-    });
-    updateTodayProgress();
-  }
-  function updateTodayProgress(){
-    var s=dayStats(todayD);
-    document.getElementById('todayDone').textContent=s.done;
-    document.getElementById('todayTotal').textContent=s.required;
-    document.getElementById('todayBar').style.width=(s.required>0?Math.round(s.done/s.required*100):(s.closed?100:0))+'%';
-    document.getElementById('allDone').classList.toggle('show', s.closed);
-  }
-  function makeExpandDetail(h,dk){
-    var det=document.createElement('div'); det.className='detail';
-    if(h.subitems && h.subitems.length){
-      var subLab=document.createElement('div'); subLab.className='dlabel'; subLab.textContent='Подразделы';
-      det.appendChild(subLab);
-      var ul=document.createElement('ul'); ul.className='sublist';
-      h.subitems.forEach(function(s){
-        var li=document.createElement('li'); li.className='subitem';
-        var cb=document.createElement('button'); cb.type='button'; cb.className='subcheck'; cb.setAttribute('role','checkbox');
-        var checked=!!(state.subState[dk] && state.subState[dk][h.id] && state.subState[dk][h.id][s.id]);
-        cb.setAttribute('aria-checked', checked?'true':'false');
-        cb.classList.toggle('on',checked);
-        cb.innerHTML=CHK;
-        cb.style.setProperty('--dot',h.color);
-        cb.setAttribute('aria-label',s.text);
-        cb.addEventListener('click',function(){
-          if(!state.subState[dk]) state.subState[dk]={};
-          if(!state.subState[dk][h.id]) state.subState[dk][h.id]={};
-          var cur=!!state.subState[dk][h.id][s.id];
-          if(cur){ delete state.subState[dk][h.id][s.id]; } else { state.subState[dk][h.id][s.id]=true; }
-          if(Object.keys(state.subState[dk][h.id]).length===0) delete state.subState[dk][h.id];
-          if(Object.keys(state.subState[dk]).length===0) delete state.subState[dk];
-          cb.classList.toggle('on', !cur); cb.setAttribute('aria-checked', !cur?'true':'false');
-          saveSoon();
-        });
-        var txt=document.createElement('span'); txt.className='subtext'; txt.textContent=s.text;
-        li.appendChild(cb); li.appendChild(txt); ul.appendChild(li);
-      });
-      det.appendChild(ul);
-    }
-    var lab=document.createElement('div'); lab.className='dlabel'; lab.textContent='Заметка на сегодня (необязательно)';
-    var ta=document.createElement('textarea'); ta.className='tinput'; ta.rows=3; ta.placeholder='Коротко: как прошло, что заметил…';
-    ta.value=(state.notes[dk] && state.notes[dk][h.id])||'';
-    ta.addEventListener('input',function(){ if(!state.notes[dk]) state.notes[dk]={}; state.notes[dk][h.id]=ta.value; saveSoon(); });
-    det.appendChild(lab); det.appendChild(ta);
-    return det;
-  }
-
-  function bindReflect(){
-    var ta=document.getElementById('dayReflect');
-    ta.value=state.journal[todayKey]||'';
-    ta.addEventListener('input',function(){ state.journal[todayKey]=ta.value; saveSoon(); });
-  }
-
-  var viewMonday=mondayOf(todayD);
-  function weekRangeLabel(monday){
-    var end=addDays(monday,6);
-    var mo=function(d){return d.toLocaleDateString('ru-RU',{month:'short'}).replace('.','');};
-    return monday.getDate()+' '+mo(monday)+' — '+end.getDate()+' '+mo(end);
-  }
-  function renderWeek(){
-    document.getElementById('weekLbl').textContent=weekRangeLabel(viewMonday);
-    var g=document.getElementById('weekGrid');
-    if(state.habits.length===0){
-      g.hidden=true; g.innerHTML='';
-      document.getElementById('weekEmpty').hidden=false;
-      document.getElementById('weekBarWrap').hidden=true;
-      return;
-    }
-    g.hidden=false;
-    document.getElementById('weekEmpty').hidden=true;
-    document.getElementById('weekBarWrap').hidden=false;
-    g.innerHTML='';
-    var dates=[]; for(var i=0;i<7;i++) dates.push(addDays(viewMonday,i));
-    var thead=document.createElement('thead'), hr=document.createElement('tr');
-    var corner=document.createElement('th'); corner.className='hlabel'; hr.appendChild(corner);
-    dates.forEach(function(d){
-      var th=document.createElement('th'); if(sameDay(d,todayD)) th.className='col-today';
-      th.innerHTML=DAYS[wdIdx(d)]+'<span class="dn">'+d.getDate()+'</span>'; hr.appendChild(th);
-    });
-    thead.appendChild(hr); g.appendChild(thead);
-    var tb=document.createElement('tbody'), totReq=0, totDone=0;
-    state.habits.forEach(function(h){
-      var tr=document.createElement('tr');
-      var lab=document.createElement('td'); lab.className='hlabel';
-      var hc=document.createElement('div'); hc.className='hcell';
-      var dot=document.createElement('span'); dot.className='hdot'; dot.style.background=h.color;
-      var nm=document.createElement('span'); nm.className='hname'; nm.textContent=h.name;
-      hc.appendChild(dot); hc.appendChild(nm); lab.appendChild(hc); tr.appendChild(lab);
-      dates.forEach(function(d){
-        var td=document.createElement('td'); if(sameDay(d,todayD)) td.className='gtd';
-        var dk=key(d);
-        if(!scheduledOn(h,d)){ var na=document.createElement('span'); na.className='gtick na'; td.appendChild(na); }
-        else{
-          var st=stateOf(dk,h.id);
-          if(st!=='skip') totReq++; if(st==='done') totDone++;
-          var b=document.createElement('button'); b.type='button'; b.className='gtick'; b.setAttribute('role','checkbox');
-          b.setAttribute('aria-label',h.name+' · '+DAYS[wdIdx(d)]);
-          b.style.setProperty('--dot',h.color); b.innerHTML=CHK+SKIP; applyGridTickVisual(b,st);
-          (function(dk,id){ b.addEventListener('click',function(){ cycleDayState(dk,id); afterStateChange(dk,id); }); })(dk,h.id);
-          td.appendChild(b);
-        }
-        tr.appendChild(td);
-      });
-      tb.appendChild(tr);
-    });
-    g.appendChild(tb);
-    document.getElementById('weekBar').style.width=(totReq>0?Math.round(totDone/totReq*100):0)+'%';
-    document.getElementById('weekNum').textContent=(totReq>0?Math.round(totDone/totReq*100)+'%':'—');
-  }
-
-  function closedStreak(){
-    var cur=0, dd=new Date(todayD); if(!dayStats(todayD).closed) dd=addDays(todayD,-1);
-    for(var n=0;n<400;n++){ if(dayStats(dd).closed){ cur++; dd=addDays(dd,-1);} else break; }
-    return cur;
-  }
-  function habitStreak(id){
-    var h=findHabit(id); if(!h) return 0;
-    var st=0, d2=new Date(todayD);
-    for(var n=0;n<400;n++){
-      if(!scheduledOn(h,d2)){ if(key(d2)<h.createdAt) break; d2=addDays(d2,-1); continue; }
-      var v=stateOf(key(d2),id);
-      if(v==='skip'){ d2=addDays(d2,-1); continue; }
-      if(v==='done'){ st++; }
-      else if(sameDay(d2,todayD)){ }
-      else break;
-      d2=addDays(d2,-1);
-    }
-    return st;
-  }
-
-  function renderProgress(){
-    var hasHabits=state.habits.length>0;
-    document.getElementById('progressEmpty').hidden=hasHabits;
-    document.getElementById('progressContent').hidden=!hasHabits;
-    if(!hasHabits) return;
-
-    var totReq=0, totDone=0, closed=0, recorded=Object.keys(state.days);
-    recorded.forEach(function(dk){ var s=dayStats(parseKey(dk)); totReq+=s.required; totDone+=s.done; if(s.closed) closed++; });
-    document.getElementById('stOverall').textContent=(totReq>0?Math.round(totDone/totReq*100)+'%':'—');
-    document.getElementById('stClosed').textContent=closed;
-    document.getElementById('stStreak').textContent=closedStreak();
-    var best=0;
-    if(recorded.length){
-      recorded.sort(); var start=parseKey(recorded[0]), run=0, cd=new Date(start);
-      while(cd<=todayD){ if(dayStats(cd).closed){ run++; if(run>best) best=run; } else run=0; cd=addDays(cd,1); }
-    }
-    document.getElementById('stBest').textContent=best;
-
-    var box=document.getElementById('habitBreak'); box.innerHTML='';
-    state.habits.forEach(function(h){
-      var done=0, skip=0;
-      recorded.forEach(function(dk){ var v=stateOf(dk,h.id); if(v==='done')done++; else if(v==='skip')skip++; });
-      var row=document.createElement('div'); row.className='hrow';
-      var dot=document.createElement('span'); dot.className='hdot'; dot.style.background=h.color;
-      var nm=document.createElement('span'); nm.className='nm'; nm.textContent=h.name;
-      var val=document.createElement('span'); val.className='val';
-      val.innerHTML='<b>'+done+'</b> раз'+(skip?' · '+skip+' проп.':'')+' · серия <b>'+habitStreak(h.id)+'</b>';
-      row.appendChild(dot); row.appendChild(nm); row.appendChild(val); box.appendChild(row);
-    });
-  }
-
-  function buildReport(){
-    var L=[];
-    L.push('Ты — трезвый, честный коуч по привычкам и продуктивности. Ниже — данные из моего трекера привычек «Rhythm».');
-    L.push('Задача: дай короткий честный разбор — что реально работает, что проседает, на что обратить внимание в первую очередь. Без воды ради воды. Осознанный пропуск — это не провал, это учтённый отдых.');
-    L.push('');
-    if(!state.habits.length){ L.push('Пока не добавлено ни одной привычки.'); return L.join('\n'); }
-
-    L.push('== ПРИВЫЧКИ (текущий список) ==');
-    state.habits.forEach(function(h){
-      var days=h.days.map(function(v,i){return v?DAYS[i]:null;}).filter(Boolean).join(', ')||'нет дней';
-      var subs=(h.subitems&&h.subitems.length)?(' · подразделы: '+h.subitems.map(function(s){return s.text;}).join(', ')):'';
-      L.push('- '+h.name+(h.subtitle?' — '+h.subtitle:'')+' · дни: '+days+subs);
-    });
-    L.push('');
-    L.push('== ИТОГО ==');
-    var recorded=Object.keys(state.days).sort();
-    if(!recorded.length){ L.push('Пока нет ни одной отметки.'); }
-    else{
-      var totReq=0,totDone=0,closed=0;
-      recorded.forEach(function(dk){ var s=dayStats(parseKey(dk)); totReq+=s.required; totDone+=s.done; if(s.closed)closed++; });
-      L.push('Период: '+recorded[0]+' … '+key(todayD)+' (дней с отметками: '+recorded.length+')');
-      L.push('Общее выполнение: '+(totReq>0?Math.round(totDone/totReq*100):0)+'%  ·  дней закрыто полностью: '+closed);
-      L.push('Серия закрытых дней подряд: текущая '+closedStreak());
-      L.push('');
-      L.push('== ПО ПРИВЫЧКАМ (выполнено / пропущено / серия) ==');
-      state.habits.forEach(function(h){
-        var done=0,skip=0; recorded.forEach(function(dk){ var v=stateOf(dk,h.id); if(v==='done')done++; else if(v==='skip')skip++; });
-        L.push('- '+h.name+': '+done+' / '+skip+' / '+habitStreak(h.id));
-      });
-      L.push('');
-      L.push('== ПО НЕДЕЛЯМ (выполнение) ==');
-      var m0=mondayOf(parseKey(recorded[0])), mNow=mondayOf(todayD), weeks=[];
-      for(var wm=new Date(m0); wm<=mNow; wm=addDays(wm,7)){
-        var wReq=0,wDone=0;
-        for(var i=0;i<7;i++){ var d=addDays(wm,i); if(d>todayD) break; var s=dayStats(d); wReq+=s.required; wDone+=s.done; }
-        weeks.push('нед. '+wm.getDate()+'.'+pad(wm.getMonth()+1)+': '+(wReq>0?Math.round(wDone/wReq*100):0)+'%');
-      }
-      weeks.slice(-8).forEach(function(x){ L.push(x); });
-      L.push('');
-      L.push('== ЗАМЕТКИ (последние дни) ==');
-      var shown=0;
-      for(var n=0;n<21 && shown<7;n++){
-        var d=addDays(todayD,-n), dk=key(d), parts=[];
-        var notesForDay=state.notes[dk];
-        if(notesForDay){
-          Object.keys(notesForDay).forEach(function(hid){
-            var h=findHabit(hid), txt=notesForDay[hid];
-            if(h && txt && txt.trim()) parts.push(h.name+': '+txt.trim());
-          });
-        }
-        var journal=state.journal[dk];
-        if(journal && journal.trim()) parts.push('итог дня: '+journal.trim());
-        if(parts.length){ L.push('['+dk+'] '+parts.join(' | ')); shown++; }
-      }
-      if(!shown) L.push('(записей пока нет)');
-    }
-    L.push('');
-    L.push('== RAW (резервная копия, не разбирай) ==');
-    L.push(JSON.stringify(state));
-    return L.join('\n');
-  }
-  function fillReport(){ document.getElementById('reportOut').value=buildReport(); }
-  function selectFallback(ta){ ta.focus(); ta.select(); try{ document.execCommand('copy'); }catch(e){} }
-  function copyReport(){
-    var ta=document.getElementById('reportOut'), status=document.getElementById('copied');
-    if(!ta.value.trim()) ta.value=buildReport();
-    var txt=ta.value;
-    var ok=function(){ status.classList.add('show'); setTimeout(function(){ status.classList.remove('show'); },2500); };
-    try{
-      if(navigator.clipboard && navigator.clipboard.writeText){
-        navigator.clipboard.writeText(txt).then(ok, function(){ selectFallback(ta); ok(); });
-      } else { selectFallback(ta); ok(); }
-    }catch(e){ selectFallback(ta); ok(); }
-  }
-
-  // ---- add / edit / delete habit sheet ----
-  var sheetEditingId=null, sheetSubitems=[];
-  (function(){
-    var dp=document.getElementById('dayPicker');
-    DAYS.forEach(function(lbl,i){
-      var b=document.createElement('button'); b.type='button'; b.className='daychip'; b.dataset.d=i; b.textContent=lbl;
-      b.setAttribute('aria-pressed','false');
-      b.addEventListener('click',function(){ var on=!b.classList.contains('on'); b.classList.toggle('on',on); b.setAttribute('aria-pressed',on?'true':'false'); });
-      dp.appendChild(b);
-    });
-  })();
-  function renderSubitemRows(){
-    var box=document.getElementById('subitemsList'); box.innerHTML='';
-    sheetSubitems.forEach(function(s,idx){
-      var row=document.createElement('div'); row.className='subrow';
-      var inp=document.createElement('input'); inp.className='finput'; inp.type='text'; inp.placeholder='Например: Разминка'; inp.maxLength=40; inp.value=s.text;
-      inp.addEventListener('input',function(){ s.text=inp.value; });
-      var rm=document.createElement('button'); rm.type='button'; rm.className='subrm'; rm.textContent='×';
-      rm.setAttribute('aria-label','Удалить подраздел');
-      rm.addEventListener('click',function(){ sheetSubitems.splice(idx,1); renderSubitemRows(); });
-      row.appendChild(inp); row.appendChild(rm); box.appendChild(row);
-    });
-  }
-  document.getElementById('addSubitem').addEventListener('click',function(){
-    sheetSubitems.push({id:uid('s'),text:''});
-    renderSubitemRows();
-    var inputs=document.querySelectorAll('#subitemsList .finput');
-    if(inputs.length) inputs[inputs.length-1].focus();
-  });
-  function openHabitSheet(h){
-    sheetEditingId=h?h.id:null;
-    document.getElementById('sheetTitle').textContent=h?'Изменить привычку':'Новая привычка';
-    document.getElementById('habitName').value=h?h.name:'';
-    document.getElementById('habitSubtitle').value=h?(h.subtitle||''):'';
-    document.querySelectorAll('#dayPicker .daychip').forEach(function(c){
-      var d=+c.dataset.d, on=h?!!h.days[d]:true;
-      c.classList.toggle('on',on); c.setAttribute('aria-pressed',on?'true':'false');
-    });
-    sheetSubitems=(h && h.subitems)?h.subitems.map(function(s){return {id:s.id,text:s.text};}):[];
-    renderSubitemRows();
-    document.getElementById('habitDelete').style.display=h?'inline-block':'none';
-    document.getElementById('sheetBackdrop').classList.add('open');
-    document.getElementById('habitName').focus();
-  }
-  function closeSheet(){ document.getElementById('sheetBackdrop').classList.remove('open'); sheetEditingId=null; }
-  function renderAll(){ buildToday(); renderWeek(); renderProgress(); }
-
-  document.getElementById('habitSave').addEventListener('click',function(){
-    var name=document.getElementById('habitName').value.trim();
-    if(!name){ document.getElementById('habitName').focus(); return; }
-    var subtitle=document.getElementById('habitSubtitle').value.trim();
-    var days=[0,1,2,3,4,5,6].map(function(i){ return document.querySelector('#dayPicker .daychip[data-d="'+i+'"]').classList.contains('on'); });
-    var subitems=sheetSubitems.map(function(s){ return {id:s.id,text:(s.text||'').trim()}; }).filter(function(s){ return s.text; });
-    if(sheetEditingId){
-      var h=findHabit(sheetEditingId);
-      if(h){ h.name=name; h.subtitle=subtitle; h.days=days; h.subitems=subitems; }
-    } else {
-      state.habits.push({
-        id:uid('h'), name:name, subtitle:subtitle,
-        color:PALETTE[state.habits.length%PALETTE.length],
-        days:days, subitems:subitems, createdAt:todayKey
-      });
-    }
-    save(); closeSheet(); renderAll();
-  });
-  document.getElementById('habitDelete').addEventListener('click',function(){
-    if(!sheetEditingId) return;
-    var h=findHabit(sheetEditingId); if(!h) return;
-    if(!confirm('Удалить привычку «'+h.name+'»? История отметок по ней тоже удалится.')) return;
-    state.habits=state.habits.filter(function(x){return x.id!==sheetEditingId;});
-    Object.keys(state.days).forEach(function(dk){
-      if(state.days[dk][h.id]!==undefined){ delete state.days[dk][h.id]; if(Object.keys(state.days[dk]).length===0) delete state.days[dk]; }
-    });
-    Object.keys(state.notes).forEach(function(dk){
-      if(state.notes[dk] && state.notes[dk][h.id]!==undefined){ delete state.notes[dk][h.id]; if(Object.keys(state.notes[dk]).length===0) delete state.notes[dk]; }
-    });
-    Object.keys(state.subState).forEach(function(dk){
-      if(state.subState[dk] && state.subState[dk][h.id]!==undefined){ delete state.subState[dk][h.id]; if(Object.keys(state.subState[dk]).length===0) delete state.subState[dk]; }
-    });
-    save(); closeSheet(); renderAll();
-  });
-  document.getElementById('sheetClose').addEventListener('click',closeSheet);
-  document.getElementById('sheetBackdrop').addEventListener('click',function(e){ if(e.target===this) closeSheet(); });
-  document.getElementById('headerAddBtn').addEventListener('click',function(){ openHabitSheet(null); });
-  document.getElementById('emptyAddBtn').addEventListener('click',function(){ openHabitSheet(null); });
-
-  var tabs=document.querySelectorAll('.tab');
-  tabs.forEach(function(t){
-    t.addEventListener('click',function(){
-      tabs.forEach(function(x){ x.setAttribute('aria-selected','false'); });
-      t.setAttribute('aria-selected','true');
-      document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('active'); });
-      document.getElementById('p-'+t.dataset.tab).classList.add('active');
-    });
-  });
-  document.getElementById('prevWeek').addEventListener('click',function(){ viewMonday=addDays(viewMonday,-7); renderWeek(); });
-  document.getElementById('nextWeek').addEventListener('click',function(){ viewMonday=addDays(viewMonday,7); renderWeek(); });
-  document.getElementById('thisWeek').addEventListener('click',function(){ viewMonday=mondayOf(new Date()); renderWeek(); });
-  document.getElementById('buildReport').addEventListener('click',fillReport);
-  document.getElementById('copyReport').addEventListener('click',copyReport);
-
-  if('serviceWorker' in navigator){
-    window.addEventListener('load',function(){ navigator.serviceWorker.register('sw.js').catch(function(){}); });
-  }
-
-  load().then(function(){ renderAll(); bindReflect(); });
-})();
-</script>
+<script src="model.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
+
