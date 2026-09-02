@@ -1,4 +1,4 @@
-var CACHE='rhythm-v3';
+var CACHE='rhythm-v4';
 var ASSETS=['./','./index.html','./styles.css','./model.js','./app.js','./manifest.json','./icon.svg'];
 
 self.addEventListener('install',function(event){
@@ -33,5 +33,4 @@ self.addEventListener('fetch',function(event){
     return cached||update;
   }));
 });
-
 
