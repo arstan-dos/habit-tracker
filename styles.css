@@ -45,6 +45,7 @@
 
   .today-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:2px}
   .today-date{font-family:Archivo,sans-serif;font-weight:700;font-size:17px;text-transform:capitalize;letter-spacing:-.2px}
+  .today-add{white-space:nowrap}
 
   .bar{position:relative;height:10px;border-radius:5px;background:var(--line-soft);overflow:hidden;margin:13px 0 4px}
   .bar > i{position:relative;z-index:1;display:block;height:100%;background:var(--accent);border-radius:5px;width:0;transition:width .4s cubic-bezier(.2,.7,.2,1)}
@@ -55,7 +56,7 @@
   .hint{font-size:11.5px;color:var(--muted);margin:0 0 8px}
 
   ul.list{list-style:none;margin:0;padding:0}
-  li.item{display:flex;align-items:flex-start;flex-wrap:wrap;gap:10px;padding:12px 4px;border-top:1px solid var(--line-soft)}
+  li.item{display:flex;align-items:center;flex-wrap:wrap;gap:12px;padding:11px 4px;border-top:1px solid var(--line-soft)}
   li.item:first-child{border-top:0}
 
   .tickgroup{display:flex;gap:8px;flex:0 0 auto}
@@ -64,21 +65,17 @@
   .item.unscheduled{opacity:.72}
   .item.unscheduled .it-title .t{color:var(--muted)}
   .offday-summary{border-left:3px solid var(--line);padding:8px 10px;margin:2px 0 8px}
-  .tickbtn{display:flex;flex-direction:column;align-items:center;gap:3px;border:0;background:transparent;cursor:pointer;padding:1px 0;width:38px}
-  .tickbtn .box{width:24px;height:24px;border-radius:7px;border:2px solid var(--line);background:#fff;display:grid;place-items:center;margin:0 auto}
-  .tickbtn .cap{font-size:9px;color:var(--muted);font-weight:700;letter-spacing:.2px;line-height:1;text-transform:uppercase}
-  .tickbtn.done .box svg{width:14px;height:14px;stroke:#fff;stroke-width:3.4;fill:none;opacity:0;transform:scale(.6);transition:opacity .12s,transform .12s}
-  .tickbtn.done.active .box{background:var(--dot,var(--accent));border-color:var(--dot,var(--accent))}
-  .tickbtn.done.active .box svg{opacity:1;transform:scale(1)}
-  .tickbtn.done.active .cap{color:var(--ink)}
-  .tickbtn.skip .box{border-style:dashed}
-  .tickbtn.skip .box .skipmark{font-weight:800;color:var(--amber);font-size:14px;line-height:1;opacity:0}
-  .tickbtn.skip.active .box{border-color:var(--amber)}
-  .tickbtn.skip.active .box .skipmark{opacity:1}
-  .tickbtn.skip.active .cap{color:var(--amber)}
-  .tickbtn:focus-visible{outline:2px solid var(--accent-deep);outline-offset:2px;border-radius:8px}
+  .tick{flex:0 0 auto;width:30px;height:30px;border-radius:8px;border:2px solid var(--dot,#ccc);
+        background:#fff;cursor:pointer;display:grid;place-items:center;padding:0;transition:background .12s,border-color .12s}
+  .tick svg{width:15px;height:15px;stroke:#fff;stroke-width:3.2;fill:none;opacity:0;transform:scale(.6);transition:opacity .12s,transform .12s}
+  .tick .skipmark{font-weight:800;color:var(--amber);font-size:16px;line-height:1;display:none}
+  .tick[data-state="done"]{background:var(--dot);border-color:var(--dot)}
+  .tick[data-state="done"] svg{opacity:1;transform:scale(1)}
+  .tick[data-state="skip"]{background:#fff;border-color:var(--amber);border-style:dashed}
+  .tick[data-state="skip"] .skipmark{display:block}
+  .tick:focus-visible{outline:2px solid var(--accent-deep);outline-offset:2px}
 
-  .it-body{flex:1 1 140px;min-width:0;padding-top:2px}
+  .it-body{flex:1 1 auto;min-width:0}
   .it-title{font-weight:600;font-size:14px;background:none;border:0;padding:0;font-family:inherit;color:var(--ink);text-align:left;cursor:pointer}
   .it-title .chev{display:inline-block;width:0;height:0;border-left:5px solid var(--muted);
        border-top:4px solid transparent;border-bottom:4px solid transparent;margin-left:7px;transform:rotate(0);transition:transform .15s;vertical-align:middle}
@@ -208,14 +205,6 @@
   .import-block{border-top:1px solid var(--line-soft);margin-top:18px;padding-top:2px}
   .import-block .finput{margin-bottom:10px}
   .form-error{color:var(--danger);font-size:12px;font-weight:600;margin:7px 0 0}
-  .manager-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:8px}
-  .manager-head .note{margin:5px 0 0}
-  .manager-list{list-style:none;margin:0;padding:0}
-  .manager-item{display:flex;align-items:center;gap:10px;padding:12px 2px;border-top:1px solid var(--line-soft)}
-  .manager-info{min-width:0;flex:1}
-  .manager-name{font-size:14px;font-weight:700;overflow-wrap:anywhere}
-  .manager-schedule{font-size:12px;color:var(--muted);margin-top:2px}
-  .manager-edit{min-width:44px;min-height:40px}
   .toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));transform:translateX(-50%);
     z-index:80;max-width:calc(100% - 32px);background:var(--ink);color:#fff;border-radius:10px;padding:10px 14px;
     box-shadow:0 7px 24px rgba(23,35,43,.25);font-size:13px;text-align:center}
@@ -227,8 +216,9 @@
     .tab{font-size:12px;padding-left:3px;padding-right:3px}
   }
   @media (pointer:coarse){
-    .gtick,.subcheck{width:36px;height:36px}
+    .tick,.gtick,.subcheck{width:36px;height:36px}
     .rowedit,.sheet-close,.subrm{width:44px;height:44px}
   }
   @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
 
