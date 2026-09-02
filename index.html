@@ -33,16 +33,18 @@
     <button class="tab" id="tab-today" role="tab" aria-selected="true" aria-controls="p-today" tabindex="0" data-tab="today">Сегодня</button>
     <button class="tab" id="tab-week" role="tab" aria-selected="false" aria-controls="p-week" tabindex="-1" data-tab="week">Неделя</button>
     <button class="tab" id="tab-progress" role="tab" aria-selected="false" aria-controls="p-progress" tabindex="-1" data-tab="progress">Прогресс</button>
-    <button class="tab" id="tab-habits" role="tab" aria-selected="false" aria-controls="p-habits" tabindex="-1" data-tab="habits">Привычки</button>
   </div>
 
   <section class="panel active" id="p-today" role="tabpanel" aria-labelledby="tab-today">
     <div class="card">
-      <div class="today-head"><div class="today-date" id="todayDate">—</div></div>
+      <div class="today-head">
+        <div class="today-date" id="todayDate">—</div>
+        <button class="navbtn today-add" id="todayAddBtn" type="button">+ Добавить привычку</button>
+      </div>
       <div id="todayProgressBlock" hidden>
         <div class="bar"><i id="todayBar"></i></div>
         <div class="bar-label"><b id="todayDone">0</b> из <b id="todayTotal">0</b> выполнено сегодня</div>
-        <div class="hint">У запланированных на сегодня привычек слева доступны «сделано» и «пропуск». Остальные привычки тоже показаны ниже. Название открывает подразделы и заметку, карандаш — редактирование.</div>
+        <div class="hint">Нажимай квадрат слева: первый раз — выполнено, второй — пропуск, третий — очистить отметку. Название открывает подразделы и заметку, карандаш — редактирование.</div>
       </div>
       <ul class="list" id="todayList" hidden></ul>
       <div class="hint offday-summary" id="noneToday" hidden>На сегодня ничего не запланировано. Все привычки всё равно доступны ниже.</div>
@@ -119,19 +121,6 @@
     </div>
   </section>
 
-  <section class="panel" id="p-habits" role="tabpanel" aria-labelledby="tab-habits" hidden>
-    <div class="card">
-      <div class="manager-head">
-        <div>
-          <h2 class="sec">Все привычки</h2>
-          <p class="note">Здесь можно изменить или удалить привычку независимо от её расписания.</p>
-        </div>
-        <button class="btn-primary" id="managerAddBtn" type="button">Добавить</button>
-      </div>
-      <ul class="manager-list" id="habitManager"></ul>
-      <p class="hint" id="managerEmpty">Пока нет привычек.</p>
-    </div>
-  </section>
 </div>
 
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
@@ -164,4 +153,5 @@
 <script src="app.js"></script>
 </body>
 </html>
+
 
