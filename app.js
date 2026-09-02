@@ -87,29 +87,38 @@
       todayD.toLocaleDateString('ru-RU',{weekday:'long',day:'numeric',month:'long'});
     var hasHabits=state.habits.length>0;
     document.getElementById('emptyState').hidden=hasHabits;
-    document.getElementById('todayProgressBlock').hidden=!hasHabits;
-
-    var items=hasHabits?state.habits.filter(function(h){ return scheduledOn(h,todayD); }):[];
+    var items=hasHabits?state.habits.slice():[];
+    items.sort(function(a,b){ return Number(scheduledOn(b,todayD))-Number(scheduledOn(a,todayD)); });
+    var scheduledCount=items.filter(function(h){return scheduledOn(h,todayD);}).length;
+    document.getElementById('todayProgressBlock').hidden=scheduledCount===0;
     var ul=document.getElementById('todayList');
     ul.innerHTML=''; todayTicks={};
-    ul.hidden = !hasHabits || items.length===0;
-    document.getElementById('noneToday').hidden = !(hasHabits && items.length===0);
+    ul.hidden = !hasHabits;
+    document.getElementById('noneToday').hidden = !(hasHabits && scheduledCount===0);
 
     items.forEach(function(h){
-      var li=document.createElement('li'); li.className='item';
+      var isScheduled=scheduledOn(h,todayD);
+      var li=document.createElement('li'); li.className='item'+(isScheduled?'':' unscheduled');
 
       var group=document.createElement('div'); group.className='tickgroup';
-      var doneBtn=document.createElement('button'); doneBtn.type='button'; doneBtn.className='tickbtn done';
-      doneBtn.innerHTML='<span class="box">'+CHK+'</span><span class="cap">сделано</span>';
-      doneBtn.setAttribute('aria-pressed','false');
-      doneBtn.setAttribute('aria-label','«'+h.name+'»: отметить как сделано');
-      doneBtn.querySelector('.box').style.setProperty('--dot',h.color);
-      var skipBtn=document.createElement('button'); skipBtn.type='button'; skipBtn.className='tickbtn skip';
-      skipBtn.innerHTML='<span class="box">'+SKIP+'</span><span class="cap">пропуск</span>';
-      skipBtn.setAttribute('aria-pressed','false');
-      skipBtn.setAttribute('aria-label','«'+h.name+'»: отметить как осознанный пропуск');
+      var doneBtn,skipBtn;
+      if(isScheduled){
+        doneBtn=document.createElement('button'); doneBtn.type='button'; doneBtn.className='tickbtn done';
+        doneBtn.innerHTML='<span class="box">'+CHK+'</span><span class="cap">сделано</span>';
+        doneBtn.setAttribute('aria-pressed','false');
+        doneBtn.setAttribute('aria-label','«'+h.name+'»: отметить как сделано');
+        doneBtn.querySelector('.box').style.setProperty('--dot',h.color);
+        skipBtn=document.createElement('button'); skipBtn.type='button'; skipBtn.className='tickbtn skip';
+        skipBtn.innerHTML='<span class="box">'+SKIP+'</span><span class="cap">пропуск</span>';
+        skipBtn.setAttribute('aria-pressed','false');
+        skipBtn.setAttribute('aria-label','«'+h.name+'»: отметить как осознанный пропуск');
+      }else{
+        var offday=document.createElement('span'); offday.className='offday-badge'; offday.textContent='не сегодня';
+        group.appendChild(offday);
+      }
 
       function refresh(){
+        if(!isScheduled)return;
         var st=stateOf(todayKey,h.id);
         doneBtn.classList.toggle('active', st==='done');
         doneBtn.setAttribute('aria-pressed', st==='done'?'true':'false');
@@ -118,16 +127,18 @@
         li.classList.toggle('done', st==='done');
         li.classList.toggle('skipped', st==='skip');
       }
-      doneBtn.addEventListener('click',function(){
-        setDayState(todayKey,h.id, stateOf(todayKey,h.id)==='done'?'none':'done');
-        refresh(); updateTodayProgress(); renderWeek(); renderProgress();
-      });
-      skipBtn.addEventListener('click',function(){
-        setDayState(todayKey,h.id, stateOf(todayKey,h.id)==='skip'?'none':'skip');
-        refresh(); updateTodayProgress(); renderWeek(); renderProgress();
-      });
-      todayTicks[h.id]={refresh:refresh};
-      group.appendChild(doneBtn); group.appendChild(skipBtn);
+      if(isScheduled){
+        doneBtn.addEventListener('click',function(){
+          setDayState(todayKey,h.id, stateOf(todayKey,h.id)==='done'?'none':'done');
+          refresh(); updateTodayProgress(); renderWeek(); renderProgress();
+        });
+        skipBtn.addEventListener('click',function(){
+          setDayState(todayKey,h.id, stateOf(todayKey,h.id)==='skip'?'none':'skip');
+          refresh(); updateTodayProgress(); renderWeek(); renderProgress();
+        });
+        todayTicks[h.id]={refresh:refresh};
+        group.appendChild(doneBtn); group.appendChild(skipBtn);
+      }
 
       var body=document.createElement('div'); body.className='it-body';
       var title=document.createElement('button'); title.type='button'; title.className='it-title'; title.setAttribute('aria-expanded','false');
