@@ -1,4 +1,4 @@
-var CACHE='rhythm-v1';
+var CACHE='rhythm-v2';
 var ASSETS=['./','./index.html','./manifest.json','./icon.svg'];
 
 self.addEventListener('install', function(e){

@@ -26,7 +26,8 @@
     --radius:14px;
   }
   *{box-sizing:border-box}
-  html,body{margin:0}
+  html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+  html,body{margin:0;overflow-x:hidden}
   body{
     font-family:Inter,system-ui,-apple-system,sans-serif; color:var(--ink);
     background-color:var(--paper);
@@ -56,7 +57,7 @@
   .panel{display:none}
   .panel.active{display:block}
 
-  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px;max-width:100%}
   .card + .card{margin-top:14px}
 
   .today-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:2px}
@@ -71,18 +72,25 @@
   .hint{font-size:11.5px;color:var(--muted);margin:0 0 8px}
 
   ul.list{list-style:none;margin:0;padding:0}
-  li.item{display:flex;align-items:center;flex-wrap:wrap;gap:12px;padding:11px 4px;border-top:1px solid var(--line-soft)}
+  li.item{display:flex;align-items:flex-start;flex-wrap:wrap;gap:10px;padding:12px 4px;border-top:1px solid var(--line-soft)}
   li.item:first-child{border-top:0}
-  .tick{flex:0 0 auto;width:26px;height:26px;border-radius:8px;border:2px solid var(--dot,#ccc);
-        background:#fff;cursor:pointer;display:grid;place-items:center;padding:0;transition:background .12s,border-color .12s}
-  .tick svg{width:15px;height:15px;stroke:#fff;stroke-width:3.2;fill:none;opacity:0;transform:scale(.6);transition:opacity .12s,transform .12s}
-  .tick .skipmark{font-weight:800;color:var(--amber);font-size:16px;line-height:1;display:none}
-  .tick[data-state="done"]{background:var(--dot);border-color:var(--dot)}
-  .tick[data-state="done"] svg{opacity:1;transform:scale(1)}
-  .tick[data-state="skip"]{background:#fff;border-color:var(--amber);border-style:dashed}
-  .tick[data-state="skip"] .skipmark{display:block}
-  .tick:focus-visible{outline:2px solid var(--accent-deep);outline-offset:2px}
-  .it-body{flex:1 1 auto;min-width:0}
+
+  .tickgroup{display:flex;gap:8px;flex:0 0 auto}
+  .tickbtn{display:flex;flex-direction:column;align-items:center;gap:3px;border:0;background:transparent;cursor:pointer;padding:1px 0;width:38px}
+  .tickbtn .box{width:24px;height:24px;border-radius:7px;border:2px solid var(--line);background:#fff;display:grid;place-items:center;margin:0 auto}
+  .tickbtn .cap{font-size:9px;color:var(--muted);font-weight:700;letter-spacing:.2px;line-height:1;text-transform:uppercase}
+  .tickbtn.done .box svg{width:14px;height:14px;stroke:#fff;stroke-width:3.4;fill:none;opacity:0;transform:scale(.6);transition:opacity .12s,transform .12s}
+  .tickbtn.done.active .box{background:var(--dot,var(--accent));border-color:var(--dot,var(--accent))}
+  .tickbtn.done.active .box svg{opacity:1;transform:scale(1)}
+  .tickbtn.done.active .cap{color:var(--ink)}
+  .tickbtn.skip .box{border-style:dashed}
+  .tickbtn.skip .box .skipmark{font-weight:800;color:var(--amber);font-size:14px;line-height:1;opacity:0}
+  .tickbtn.skip.active .box{border-color:var(--amber)}
+  .tickbtn.skip.active .box .skipmark{opacity:1}
+  .tickbtn.skip.active .cap{color:var(--amber)}
+  .tickbtn:focus-visible{outline:2px solid var(--accent-deep);outline-offset:2px;border-radius:8px}
+
+  .it-body{flex:1 1 140px;min-width:0;padding-top:2px}
   .it-title{font-weight:600;font-size:14px;background:none;border:0;padding:0;font-family:inherit;color:var(--ink);text-align:left;cursor:pointer}
   .it-title .chev{display:inline-block;width:0;height:0;border-left:5px solid var(--muted);
        border-top:4px solid transparent;border-bottom:4px solid transparent;margin-left:7px;transform:rotate(0);transition:transform .15s;vertical-align:middle}
@@ -91,18 +99,27 @@
   .it-desc{color:var(--muted);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:2px}
   li.done .it-title .t{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--line)}
   li.skipped .it-title .t{color:var(--muted)}
-  .rowedit{flex:0 0 auto;width:28px;height:28px;border:0;background:transparent;color:var(--muted);font-size:18px;
+  .rowedit{flex:0 0 auto;width:30px;height:30px;border:0;background:transparent;color:var(--muted);font-size:15px;
        line-height:1;border-radius:8px;cursor:pointer;display:grid;place-items:center;padding:0}
   .rowedit:hover{background:var(--line-soft);color:var(--ink)}
   .rowedit:focus-visible{outline:2px solid var(--accent-deep);outline-offset:2px}
-  .detail{flex-basis:100%;width:100%;order:9;display:none;padding:4px 2px 10px 2px}
+  .detail{flex-basis:100%;width:100%;order:9;display:none;padding:6px 2px 8px 2px}
   .detail.open{display:block}
   .dlabel{font-size:11.5px;color:var(--muted);margin:2px 0 6px}
-  .tinput{width:100%;border:1px solid var(--line);border-radius:9px;padding:9px 11px;font:inherit;font-size:13px;
+  .tinput{width:100%;border:1px solid var(--line);border-radius:9px;padding:9px 11px;font:inherit;font-size:16px;
        color:var(--ink);background:#fff;resize:vertical;line-height:1.4}
   .tinput:focus{outline:2px solid var(--accent);outline-offset:0;border-color:var(--accent)}
   .alldone{margin-top:12px;font-size:13px;color:#5E9E3E;font-weight:600;display:none}
   .alldone.show{display:block}
+
+  .sublist{list-style:none;margin:0 0 12px;padding:0}
+  .subitem{display:flex;align-items:center;gap:10px;padding:6px 0}
+  .subcheck{flex:0 0 auto;width:22px;height:22px;border-radius:6px;border:2px solid var(--line);background:#fff;cursor:pointer;display:grid;place-items:center;padding:0}
+  .subcheck svg{width:13px;height:13px;stroke:#fff;stroke-width:3.6;fill:none;opacity:0;transform:scale(.6);transition:opacity .12s,transform .12s}
+  .subcheck.on{background:var(--dot,var(--accent));border-color:var(--dot,var(--accent))}
+  .subcheck.on svg{opacity:1;transform:scale(1)}
+  .subcheck:focus-visible{outline:2px solid var(--accent-deep);outline-offset:2px}
+  .subtext{font-size:13px;color:var(--ink)}
 
   .empty-state{text-align:center;padding:30px 8px 8px}
   .empty-badge{width:52px;height:52px;border-radius:16px;background:var(--accent);color:#fff;font-size:28px;font-weight:800;
@@ -112,22 +129,27 @@
 
   .sheet-backdrop{position:fixed;inset:0;background:rgba(23,35,43,.45);display:none;align-items:flex-end;justify-content:center;z-index:50}
   .sheet-backdrop.open{display:flex}
-  .sheet{background:var(--panel);width:100%;max-width:480px;border-radius:18px 18px 0 0;padding:20px 18px calc(20px + env(safe-area-inset-bottom));max-height:88vh;overflow:auto}
+  .sheet{background:var(--panel);width:100%;max-width:480px;border-radius:18px 18px 0 0;padding:20px 18px calc(20px + env(safe-area-inset-bottom));max-height:88vh;overflow:auto;overflow-x:hidden}
   @media (min-width:600px){ .sheet-backdrop{align-items:center;padding:20px} .sheet{border-radius:16px} }
   .sheet-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
   .sheet-title{font-family:Archivo,sans-serif;font-weight:700;font-size:16px}
-  .sheet-close{width:30px;height:30px;border:0;background:var(--line-soft);border-radius:9px;font-size:17px;cursor:pointer;color:var(--ink);line-height:1}
+  .sheet-close{width:30px;height:30px;border:0;background:var(--line-soft);border-radius:9px;font-size:17px;cursor:pointer;color:var(--ink);line-height:1;flex:0 0 auto}
   .sheet-close:focus-visible{outline:2px solid var(--accent-deep);outline-offset:2px}
   .flabel{display:block;font-size:11.5px;color:var(--muted);margin:16px 0 6px}
   .flabel:first-of-type{margin-top:0}
   .opt-tag{font-weight:500;opacity:.75}
-  .finput{width:100%;border:1px solid var(--line);border-radius:9px;padding:10px 12px;font:inherit;font-size:14px;background:#fff;color:var(--ink)}
+  .finput{width:100%;max-width:100%;border:1px solid var(--line);border-radius:9px;padding:10px 12px;font:inherit;font-size:16px;background:#fff;color:var(--ink)}
   .finput:focus{outline:2px solid var(--accent);outline-offset:0;border-color:var(--accent)}
   .daypicker{display:flex;gap:6px;flex-wrap:wrap}
   .daychip{flex:1 1 auto;min-width:38px;border:1.5px solid var(--line);background:#fff;border-radius:9px;padding:9px 0;
        font:inherit;font-size:12.5px;font-weight:600;color:var(--muted);cursor:pointer;text-align:center}
   .daychip.on{background:var(--accent);border-color:var(--accent);color:#fff}
   .daychip:focus-visible{outline:2px solid var(--accent-deep);outline-offset:2px}
+  .subrow{display:flex;gap:8px;align-items:center;margin-top:8px;max-width:100%}
+  .subrow .finput{flex:1 1 auto;min-width:0}
+  .subrm{flex:0 0 auto;width:32px;height:32px;border:0;background:var(--line-soft);border-radius:8px;font-size:16px;color:var(--ink);cursor:pointer}
+  .subrm:hover{background:#EBD9D9;color:var(--danger)}
+  .subadd{margin-top:8px}
   .sheet-actions{display:flex;flex-direction:column;gap:10px;margin-top:22px}
   .btn-danger{background:#fff;color:var(--danger);border:1.5px solid var(--danger);border-radius:10px;padding:10px 16px;font:inherit;font-weight:600;font-size:13.5px;cursor:pointer}
   .btn-danger:hover{background:var(--danger);color:#fff}
@@ -224,7 +246,7 @@
       <div id="todayProgressBlock" hidden>
         <div class="bar"><i id="todayBar"></i></div>
         <div class="bar-label"><b id="todayDone">0</b> из <b id="todayTotal">0</b> выполнено сегодня</div>
-        <div class="hint">Тап по квадрату: пусто → сделано → осознанный пропуск</div>
+        <div class="hint">Слева у каждой привычки — «сделано» и «пропуск». Название со стрелкой открывает подразделы и заметку. Значок карандаша — изменить привычку.</div>
       </div>
       <ul class="list" id="todayList" hidden></ul>
       <div class="hint" id="noneToday" hidden>На сегодня ничего не запланировано.</div>
@@ -308,6 +330,9 @@
     <input class="finput" id="habitSubtitle" type="text" placeholder="Например: 20 минут перед сном" maxlength="60">
     <label class="flabel">Дни недели</label>
     <div class="daypicker" id="dayPicker"></div>
+    <label class="flabel">Подразделы <span class="opt-tag">необязательно — например, этапы привычки</span></label>
+    <div id="subitemsList"></div>
+    <button type="button" class="navbtn small subadd" id="addSubitem">+ Добавить подраздел</button>
     <div class="sheet-actions">
       <button class="btn-primary" id="habitSave">Сохранить</button>
       <button class="btn-danger" id="habitDelete" style="display:none">Удалить привычку</button>
@@ -331,10 +356,11 @@
   function addDays(d,n){var x=new Date(d.getFullYear(),d.getMonth(),d.getDate());x.setDate(x.getDate()+n);return x;}
   function sameDay(a,b){return key(a)===key(b);}
   function escapeHtml(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+  function uid(prefix){ return prefix+'_'+Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
 
   // ---- storage: works inside Claude (window.storage) and standalone (localStorage) ----
   var STORE='habit_tracker_v1';
-  var state={habits:[],days:{},notes:{},journal:{}};
+  var state={habits:[],days:{},notes:{},journal:{},subState:{}};
   var memStore={};
   var hasWinStorage=(typeof window!=='undefined' && window.storage && typeof window.storage.get==='function');
   var hasLS=(function(){ try{ var k='__rhythm_t'; localStorage.setItem(k,'1'); localStorage.removeItem(k); return true; }catch(e){ return false; } })();
@@ -351,7 +377,10 @@
   async function load(){
     try{
       var v=await rawGet(STORE);
-      if(v){ var p=JSON.parse(v); if(p){ state.habits=p.habits||[]; state.days=p.days||{}; state.notes=p.notes||{}; state.journal=p.journal||{}; } }
+      if(v){ var p=JSON.parse(v); if(p){
+        state.habits=p.habits||[]; state.days=p.days||{}; state.notes=p.notes||{};
+        state.journal=p.journal||{}; state.subState=p.subState||{};
+      } }
     }catch(e){}
   }
   var saving=false,pending=false;
@@ -365,33 +394,27 @@
   var tTimer; function saveSoon(){ clearTimeout(tTimer); tTimer=setTimeout(save,400); }
 
   function stateOf(dk,id){ var d=state.days[dk]; if(!d) return 'none'; var v=d[id]; return v===true?'done':(v==='skip'?'skip':'none'); }
-  function cycleVal(dk,id){
+  function setDayState(dk,id,val){
     var d=state.days[dk]; if(!d){ d={}; state.days[dk]=d; }
-    var v=d[id];
-    if(v===undefined) d[id]=true;
-    else if(v===true) d[id]='skip';
-    else delete d[id];
+    if(val==='done') d[id]=true; else if(val==='skip') d[id]='skip'; else delete d[id];
     if(Object.keys(d).length===0) delete state.days[dk];
     save();
+  }
+  function cycleDayState(dk,id){
+    var cur=stateOf(dk,id);
+    setDayState(dk,id, cur==='none'?'done':(cur==='done'?'skip':'none'));
   }
   function findHabit(id){ for(var i=0;i<state.habits.length;i++) if(state.habits[i].id===id) return state.habits[i]; return null; }
 
   var todayD=new Date(), todayKey=key(todayD), todayWd=wdIdx(todayD), todayTicks={};
 
-  function toggleHabit(dk,id){
-    cycleVal(dk,id);
-    if(dk===todayKey && todayTicks[id]) applyTodayVisual(id);
+  function afterStateChange(dk,id){
+    if(dk===todayKey && todayTicks[id]) todayTicks[id].refresh();
     updateTodayProgress(); renderWeek(); renderProgress();
   }
-  function applyTickVisual(el,st){
+  function applyGridTickVisual(el,st){
     el.setAttribute('data-state',st);
     el.setAttribute('aria-checked', st==='done'?'true':(st==='skip'?'mixed':'false'));
-  }
-  function applyTodayVisual(id){
-    var st=stateOf(todayKey,id), btn=todayTicks[id]; if(!btn) return;
-    applyTickVisual(btn,st);
-    var li=btn.parentNode; while(li && (!li.className || li.className.indexOf('item')<0)) li=li.parentNode;
-    if(li){ li.classList.toggle('done',st==='done'); li.classList.toggle('skipped',st==='skip'); }
   }
 
   function scheduledOn(h,d){ var wd=wdIdx(d), dk=key(d); return !!h.days[wd] && dk>=h.createdAt; }
@@ -420,32 +443,57 @@
     document.getElementById('noneToday').hidden = !(hasHabits && items.length===0);
 
     items.forEach(function(h){
-      var st=stateOf(todayKey,h.id);
-      var li=document.createElement('li'); li.className='item'+(st==='done'?' done':'')+(st==='skip'?' skipped':'');
+      var li=document.createElement('li'); li.className='item';
 
-      var btn=document.createElement('button');
-      btn.className='tick'; btn.setAttribute('role','checkbox'); btn.setAttribute('aria-label',h.name);
-      btn.style.setProperty('--dot',h.color); btn.innerHTML=CHK+SKIP; applyTickVisual(btn,st);
-      btn.addEventListener('click',function(){ toggleHabit(todayKey,h.id); });
-      todayTicks[h.id]=btn;
+      var group=document.createElement('div'); group.className='tickgroup';
+      var doneBtn=document.createElement('button'); doneBtn.type='button'; doneBtn.className='tickbtn done';
+      doneBtn.innerHTML='<span class="box">'+CHK+'</span><span class="cap">сделано</span>';
+      doneBtn.setAttribute('aria-pressed','false');
+      doneBtn.setAttribute('aria-label','«'+h.name+'»: отметить как сделано');
+      doneBtn.querySelector('.box').style.setProperty('--dot',h.color);
+      var skipBtn=document.createElement('button'); skipBtn.type='button'; skipBtn.className='tickbtn skip';
+      skipBtn.innerHTML='<span class="box">'+SKIP+'</span><span class="cap">пропуск</span>';
+      skipBtn.setAttribute('aria-pressed','false');
+      skipBtn.setAttribute('aria-label','«'+h.name+'»: отметить как осознанный пропуск');
+
+      function refresh(){
+        var st=stateOf(todayKey,h.id);
+        doneBtn.classList.toggle('active', st==='done');
+        doneBtn.setAttribute('aria-pressed', st==='done'?'true':'false');
+        skipBtn.classList.toggle('active', st==='skip');
+        skipBtn.setAttribute('aria-pressed', st==='skip'?'true':'false');
+        li.classList.toggle('done', st==='done');
+        li.classList.toggle('skipped', st==='skip');
+      }
+      doneBtn.addEventListener('click',function(){
+        setDayState(todayKey,h.id, stateOf(todayKey,h.id)==='done'?'none':'done');
+        refresh(); updateTodayProgress(); renderWeek(); renderProgress();
+      });
+      skipBtn.addEventListener('click',function(){
+        setDayState(todayKey,h.id, stateOf(todayKey,h.id)==='skip'?'none':'skip');
+        refresh(); updateTodayProgress(); renderWeek(); renderProgress();
+      });
+      todayTicks[h.id]={refresh:refresh};
+      group.appendChild(doneBtn); group.appendChild(skipBtn);
 
       var body=document.createElement('div'); body.className='it-body';
-      var title=document.createElement('button'); title.className='it-title'; title.setAttribute('aria-expanded','false');
+      var title=document.createElement('button'); title.type='button'; title.className='it-title'; title.setAttribute('aria-expanded','false');
       title.innerHTML='<span class="t">'+escapeHtml(h.name)+'</span> <span class="chev"></span>';
       body.appendChild(title);
       if(h.subtitle){ var desc=document.createElement('div'); desc.className='it-desc'; desc.textContent=h.subtitle; body.appendChild(desc); }
 
-      var edit=document.createElement('button'); edit.className='rowedit'; edit.textContent='⋯';
+      var edit=document.createElement('button'); edit.type='button'; edit.className='rowedit'; edit.innerHTML='✎';
       edit.setAttribute('aria-label','Изменить привычку «'+h.name+'»');
       edit.addEventListener('click',function(e){ e.stopPropagation(); openHabitSheet(h); });
 
-      li.appendChild(btn); li.appendChild(body); li.appendChild(edit);
+      li.appendChild(group); li.appendChild(body); li.appendChild(edit);
 
-      var det=makeNoteDetail(h,todayKey); li.appendChild(det);
+      var det=makeExpandDetail(h,todayKey); li.appendChild(det);
       title.addEventListener('click',function(){
         var open=det.classList.toggle('open'); title.setAttribute('aria-expanded',open?'true':'false');
       });
 
+      refresh();
       ul.appendChild(li);
     });
     updateTodayProgress();
@@ -457,15 +505,40 @@
     document.getElementById('todayBar').style.width=(s.required>0?Math.round(s.done/s.required*100):(s.closed?100:0))+'%';
     document.getElementById('allDone').classList.toggle('show', s.closed);
   }
-  function makeNoteDetail(h,dk){
+  function makeExpandDetail(h,dk){
     var det=document.createElement('div'); det.className='detail';
+    if(h.subitems && h.subitems.length){
+      var subLab=document.createElement('div'); subLab.className='dlabel'; subLab.textContent='Подразделы';
+      det.appendChild(subLab);
+      var ul=document.createElement('ul'); ul.className='sublist';
+      h.subitems.forEach(function(s){
+        var li=document.createElement('li'); li.className='subitem';
+        var cb=document.createElement('button'); cb.type='button'; cb.className='subcheck'; cb.setAttribute('role','checkbox');
+        var checked=!!(state.subState[dk] && state.subState[dk][h.id] && state.subState[dk][h.id][s.id]);
+        cb.setAttribute('aria-checked', checked?'true':'false');
+        cb.classList.toggle('on',checked);
+        cb.innerHTML=CHK;
+        cb.style.setProperty('--dot',h.color);
+        cb.setAttribute('aria-label',s.text);
+        cb.addEventListener('click',function(){
+          if(!state.subState[dk]) state.subState[dk]={};
+          if(!state.subState[dk][h.id]) state.subState[dk][h.id]={};
+          var cur=!!state.subState[dk][h.id][s.id];
+          if(cur){ delete state.subState[dk][h.id][s.id]; } else { state.subState[dk][h.id][s.id]=true; }
+          if(Object.keys(state.subState[dk][h.id]).length===0) delete state.subState[dk][h.id];
+          if(Object.keys(state.subState[dk]).length===0) delete state.subState[dk];
+          cb.classList.toggle('on', !cur); cb.setAttribute('aria-checked', !cur?'true':'false');
+          saveSoon();
+        });
+        var txt=document.createElement('span'); txt.className='subtext'; txt.textContent=s.text;
+        li.appendChild(cb); li.appendChild(txt); ul.appendChild(li);
+      });
+      det.appendChild(ul);
+    }
     var lab=document.createElement('div'); lab.className='dlabel'; lab.textContent='Заметка на сегодня (необязательно)';
     var ta=document.createElement('textarea'); ta.className='tinput'; ta.rows=3; ta.placeholder='Коротко: как прошло, что заметил…';
     ta.value=(state.notes[dk] && state.notes[dk][h.id])||'';
-    ta.addEventListener('input',function(){
-      if(!state.notes[dk]) state.notes[dk]={};
-      state.notes[dk][h.id]=ta.value; saveSoon();
-    });
+    ta.addEventListener('input',function(){ if(!state.notes[dk]) state.notes[dk]={}; state.notes[dk][h.id]=ta.value; saveSoon(); });
     det.appendChild(lab); det.appendChild(ta);
     return det;
   }
@@ -518,10 +591,10 @@
         else{
           var st=stateOf(dk,h.id);
           if(st!=='skip') totReq++; if(st==='done') totDone++;
-          var b=document.createElement('button'); b.className='gtick'; b.setAttribute('role','checkbox');
+          var b=document.createElement('button'); b.type='button'; b.className='gtick'; b.setAttribute('role','checkbox');
           b.setAttribute('aria-label',h.name+' · '+DAYS[wdIdx(d)]);
-          b.style.setProperty('--dot',h.color); b.innerHTML=CHK+SKIP; applyTickVisual(b,st);
-          (function(dk,id){ b.addEventListener('click',function(){ toggleHabit(dk,id); }); })(dk,h.id);
+          b.style.setProperty('--dot',h.color); b.innerHTML=CHK+SKIP; applyGridTickVisual(b,st);
+          (function(dk,id){ b.addEventListener('click',function(){ cycleDayState(dk,id); afterStateChange(dk,id); }); })(dk,h.id);
           td.appendChild(b);
         }
         tr.appendChild(td);
@@ -594,7 +667,8 @@
     L.push('== ПРИВЫЧКИ (текущий список) ==');
     state.habits.forEach(function(h){
       var days=h.days.map(function(v,i){return v?DAYS[i]:null;}).filter(Boolean).join(', ')||'нет дней';
-      L.push('- '+h.name+(h.subtitle?' — '+h.subtitle:'')+' · дни: '+days);
+      var subs=(h.subitems&&h.subitems.length)?(' · подразделы: '+h.subitems.map(function(s){return s.text;}).join(', ')):'';
+      L.push('- '+h.name+(h.subtitle?' — '+h.subtitle:'')+' · дни: '+days+subs);
     });
     L.push('');
     L.push('== ИТОГО ==');
@@ -659,7 +733,7 @@
   }
 
   // ---- add / edit / delete habit sheet ----
-  var sheetEditingId=null;
+  var sheetEditingId=null, sheetSubitems=[];
   (function(){
     var dp=document.getElementById('dayPicker');
     DAYS.forEach(function(lbl,i){
@@ -669,6 +743,24 @@
       dp.appendChild(b);
     });
   })();
+  function renderSubitemRows(){
+    var box=document.getElementById('subitemsList'); box.innerHTML='';
+    sheetSubitems.forEach(function(s,idx){
+      var row=document.createElement('div'); row.className='subrow';
+      var inp=document.createElement('input'); inp.className='finput'; inp.type='text'; inp.placeholder='Например: Разминка'; inp.maxLength=40; inp.value=s.text;
+      inp.addEventListener('input',function(){ s.text=inp.value; });
+      var rm=document.createElement('button'); rm.type='button'; rm.className='subrm'; rm.textContent='×';
+      rm.setAttribute('aria-label','Удалить подраздел');
+      rm.addEventListener('click',function(){ sheetSubitems.splice(idx,1); renderSubitemRows(); });
+      row.appendChild(inp); row.appendChild(rm); box.appendChild(row);
+    });
+  }
+  document.getElementById('addSubitem').addEventListener('click',function(){
+    sheetSubitems.push({id:uid('s'),text:''});
+    renderSubitemRows();
+    var inputs=document.querySelectorAll('#subitemsList .finput');
+    if(inputs.length) inputs[inputs.length-1].focus();
+  });
   function openHabitSheet(h){
     sheetEditingId=h?h.id:null;
     document.getElementById('sheetTitle').textContent=h?'Изменить привычку':'Новая привычка';
@@ -678,6 +770,8 @@
       var d=+c.dataset.d, on=h?!!h.days[d]:true;
       c.classList.toggle('on',on); c.setAttribute('aria-pressed',on?'true':'false');
     });
+    sheetSubitems=(h && h.subitems)?h.subitems.map(function(s){return {id:s.id,text:s.text};}):[];
+    renderSubitemRows();
     document.getElementById('habitDelete').style.display=h?'inline-block':'none';
     document.getElementById('sheetBackdrop').classList.add('open');
     document.getElementById('habitName').focus();
@@ -690,14 +784,15 @@
     if(!name){ document.getElementById('habitName').focus(); return; }
     var subtitle=document.getElementById('habitSubtitle').value.trim();
     var days=[0,1,2,3,4,5,6].map(function(i){ return document.querySelector('#dayPicker .daychip[data-d="'+i+'"]').classList.contains('on'); });
+    var subitems=sheetSubitems.map(function(s){ return {id:s.id,text:(s.text||'').trim()}; }).filter(function(s){ return s.text; });
     if(sheetEditingId){
       var h=findHabit(sheetEditingId);
-      if(h){ h.name=name; h.subtitle=subtitle; h.days=days; }
+      if(h){ h.name=name; h.subtitle=subtitle; h.days=days; h.subitems=subitems; }
     } else {
       state.habits.push({
-        id:'h_'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),
-        name:name, subtitle:subtitle, color:PALETTE[state.habits.length%PALETTE.length],
-        days:days, createdAt:todayKey
+        id:uid('h'), name:name, subtitle:subtitle,
+        color:PALETTE[state.habits.length%PALETTE.length],
+        days:days, subitems:subitems, createdAt:todayKey
       });
     }
     save(); closeSheet(); renderAll();
@@ -712,6 +807,9 @@
     });
     Object.keys(state.notes).forEach(function(dk){
       if(state.notes[dk] && state.notes[dk][h.id]!==undefined){ delete state.notes[dk][h.id]; if(Object.keys(state.notes[dk]).length===0) delete state.notes[dk]; }
+    });
+    Object.keys(state.subState).forEach(function(dk){
+      if(state.subState[dk] && state.subState[dk][h.id]!==undefined){ delete state.subState[dk][h.id]; if(Object.keys(state.subState[dk]).length===0) delete state.subState[dk]; }
     });
     save(); closeSheet(); renderAll();
   });
